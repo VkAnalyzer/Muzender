@@ -1,3 +1,3 @@
 # Vk_user_analyzer
-Main goal of this project is to parse and analize user info from vk.com
+Goal of this project is to parse and analyze user info from vk.com
 
