@@ -5,11 +5,11 @@ import time
 
 def predict(user_id):
     random.seed(user_id)
-    random.choice(['Led Zeppelin',
-                   'Jefferson Airplane',
-                   'Sixto Rodriguez',
-                   'Jimi Hendrix',
-                   'Chad VanGaalen'])
+    return random.choice(['Led Zeppelin',
+                          'Jefferson Airplane',
+                          'Sixto Rodriguez',
+                          'Jimi Hendrix',
+                          'Chad VanGaalen'])
 
 
 def on_request(ch, method, props, body):
