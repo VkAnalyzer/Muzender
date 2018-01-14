@@ -1,0 +1,15 @@
+version: '3'
+services:
+  queue:
+    image: rabbitmq:3.7.2
+    ports:
+      - "5672:5672"
+
+  recommedation_service:
+    build: ./recommedation_service
+    command: python3 recommendation_app.py
+    depends_on:
+      - queue
+    deploy:
+      mode: replicated
+      replicas: 2
