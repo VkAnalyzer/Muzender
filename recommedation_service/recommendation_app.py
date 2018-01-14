@@ -1,14 +1,15 @@
 import pika
 import random
+import time
 
 
 def predict(user_id):
-    random.random.seed(user_id)
+    random.seed(user_id)
     random.choice(['Led Zeppelin',
-                             'Jefferson Airplane',
-                             'Sixto Rodriguez',
-                             'Jimi Hendrix',
-                             'Chad VanGaalen'])
+                   'Jefferson Airplane',
+                   'Sixto Rodriguez',
+                   'Jimi Hendrix',
+                   'Chad VanGaalen'])
 
 
 def on_request(ch, method, props, body):
@@ -25,7 +26,8 @@ def on_request(ch, method, props, body):
     ch.basic_ack(delivery_tag=method.delivery_tag)
 
 
-connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
+time.sleep(10)
+connection = pika.BlockingConnection(pika.ConnectionParameters(host='queue'))
 channel = connection.channel()
 channel.queue_declare(queue='rpc_queue')
 

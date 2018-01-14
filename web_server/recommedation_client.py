@@ -5,7 +5,7 @@ import numpy as np
 
 class RpcClient(object):
     def __init__(self):
-        self.response = None
+        # self.response = None
         self.corr_id = None
 
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
