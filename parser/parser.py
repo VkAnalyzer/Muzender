@@ -33,7 +33,7 @@ def get_users_audio(vk_session, vk_page):
         if not audios:
             break
 
-    all_audios = [audio for audios in all_audios for audio in audios]
+    all_audios = sum(all_audios, [])
     return all_audios
 
 
