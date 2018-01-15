@@ -37,18 +37,6 @@ def get_users_audio(vk_session, vk_page):
     return all_audios
 
 
-def top_musicians(audios, top_n=15):
-    artists = collections.Counter()
-
-    for audio in audios:
-        artists[audio['artist']] += 1
-
-    # top 15 music bands
-    print('\nTop {}:'.format(top_n))
-    for artist, tracks in artists.most_common(top_n):
-        print('{} - {} tracks'.format(artist, tracks))
-
-
 def on_request(ch, method, props, body):
 
     user_id = int(body)
@@ -59,7 +47,7 @@ def on_request(ch, method, props, body):
                      routing_key=props.reply_to,
                      properties=pika.BasicProperties(correlation_id
                                                      =props.correlation_id),
-                     body=str(response))
+                     body=pickle.dumps(response))
     ch.basic_ack(delivery_tag=method.delivery_tag)
 
 

@@ -1,11 +1,10 @@
 import pika
 import uuid
-import numpy as np
 
 
 class RpcClient(object):
     def __init__(self):
-        # self.response = None
+        self.response = None
         self.corr_id = None
 
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
@@ -36,9 +35,8 @@ class RpcClient(object):
 
 recommender = RpcClient()
 
-# user_id = np.random.randint(0, 1000)
-user_id = 288273
+user_id = -99463083
 print("requesting recommendation for user", user_id)
 response = recommender.call(user_id)
-print("turning on", response)
+print("turning on", str(response))
 recommender.connection.close()

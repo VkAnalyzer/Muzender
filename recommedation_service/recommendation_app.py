@@ -2,12 +2,13 @@ import pika
 import uuid
 import random
 import time
+import pickle
 
 
 def predict(user_id):
-    user_music = recommender.call(user_id)
-    return random.choice(user_music)
-
+    response = recommender.call(user_id)
+    user_music = pickle.loads(response)
+    return random.choice(user_music)['artist']
 
 def on_request(ch, method, props, body):
     user_id = int(body)
