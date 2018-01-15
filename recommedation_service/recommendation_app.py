@@ -58,11 +58,10 @@ class RpcClient(object):
 time.sleep(15)
 connection = pika.BlockingConnection(pika.ConnectionParameters(host='queue'))
 channel = connection.channel()
-channel.queue_declare(queue='rpc_queue')
+channel.queue_declare(queue='rpc_recommendations')
 
 channel.basic_qos(prefetch_count=1)
-# TODO rename to rpc_recommendation
-channel.basic_consume(on_request, queue='rpc_queue')
+channel.basic_consume(on_request, queue='rpc_recommendations')
 
 recommender = RpcClient()
 
