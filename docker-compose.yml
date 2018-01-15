@@ -15,6 +15,14 @@ services:
     networks:
       - queue
 
+  parser:
+    build: ./parser
+    command: python3 parser.py
+    depends_on:
+      - queue
+    networks:
+      - queue
+
 networks:
   queue:
     driver: bridge

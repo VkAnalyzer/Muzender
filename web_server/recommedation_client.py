@@ -36,7 +36,8 @@ class RpcClient(object):
 
 recommender = RpcClient()
 
-user_id = np.random.randint(0, 1000)
+# user_id = np.random.randint(0, 1000)
+user_id = 288273
 print("requesting recommendation for user", user_id)
 response = recommender.call(user_id)
 print("turning on", response)
