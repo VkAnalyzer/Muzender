@@ -16,9 +16,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.conf.urls import include, url
-from . import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    url(r'^music/', views.music_recommendation, name='music')
+    url(r'^music/', include('music_recommender.urls'))
 ]
