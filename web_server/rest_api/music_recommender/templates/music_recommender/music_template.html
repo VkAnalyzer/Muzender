@@ -1,0 +1,13 @@
+<!doctype html>
+<title>VK_USER_ANALYZER</title>
+<form method=post>
+    {% csrf_token %}
+    <dl>
+        <dt>Hi there! Please enter vk.com user_id: <br>
+        <dd><textarea name=text rows=1 cols=15>{{ user_id }}</textarea>
+        <dd><input type=submit value="Get music recommendation!">
+    </dl>
+</form>
+
+<br>We recommend you to listen the following song:<br>
+{{ predicted_song }}
