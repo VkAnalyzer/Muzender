@@ -1,4 +1,9 @@
 .idea*
+<<<<<<< Updated upstream
 *.DS_Store
 parser/secret.pkl
 parser/vk_config.v2.json
+=======
+**/secret.pkl
+**/*__pycache__*
+>>>>>>> Stashed changes
