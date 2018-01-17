@@ -23,6 +23,16 @@ services:
     networks:
       - queue
 
+  web_server:
+    build: ./web_server
+    command: python3 rest_api/manage.py runserver 0.0.0.0:8000
+    ports:
+      - "8000:8000"
+    depends_on:
+      - queue
+    networks:
+      - queue
+
 networks:
   queue:
     driver: bridge

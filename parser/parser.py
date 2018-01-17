@@ -52,10 +52,11 @@ def on_request(ch, method, props, body):
 
 
 with open('secret.pkl', mode='rb') as f:
-    secret = (pickle.load(f))
+    secret = pickle.load(f)
 login = secret['login']
 password = secret['password']
 vk_session = connect_vk(login, password)
+
 
 time.sleep(15)
 connection = pika.BlockingConnection(pika.ConnectionParameters(host='queue'))

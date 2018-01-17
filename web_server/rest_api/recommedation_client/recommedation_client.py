@@ -7,7 +7,7 @@ class RpcClient(object):
         self.response = None
         self.corr_id = None
 
-        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
+        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host='queue'))
         self.channel = self.connection.channel()
         result = self.channel.queue_declare(exclusive=True)
         self.callback_queue = result.method.queue
@@ -31,12 +31,3 @@ class RpcClient(object):
         while self.response is None:
             self.connection.process_data_events()
         return self.response
-
-
-recommender = RpcClient()
-
-user_id = -99463083
-print("requesting recommendation for user", user_id)
-response = recommender.call(user_id)
-print("turning on", str(response))
-recommender.connection.close()

@@ -56,7 +56,7 @@ class RpcClient(object):
         return self.response
 
 
-time.sleep(15)
+time.sleep(20)
 connection = pika.BlockingConnection(pika.ConnectionParameters(host='queue'))
 channel = connection.channel()
 channel.queue_declare(queue='rpc_recommendations')
