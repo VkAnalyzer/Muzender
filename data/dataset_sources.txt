@@ -1,0 +1,5 @@
+User-song-replay_rate triplets:
+http://labrosa.ee.columbia.edu/millionsong/sites/default/files/challenge/train_triplets.txt.zip
+
+Song_id-Artist_name information:
+http://labrosa.ee.columbia.edu/millionsong/sites/default/files/AdditionalFiles/unique_artists.txt
