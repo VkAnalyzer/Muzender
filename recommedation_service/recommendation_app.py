@@ -1,14 +1,30 @@
 import pika
 import uuid
-import random
 import time
 import pickle
+from scipy import sparse
+import implicit
+import pandas as pd
+import numpy as np
 
 
 def predict(user_id):
     response = recommender.call(user_id)
     user_music = pickle.loads(response)
-    return random.choice(user_music)['artist']
+
+    artists = list(pd.DataFrame(user_music)['artist'])
+    user_items = np.zeros(dataset.shape[1])
+    user_items[dataset.columns.isin(artists)] = 1
+
+    dataset_new = sparse.vstack((dataset_s,
+                                sparse.csr_matrix(user_items)))
+    last_id = dataset_new.shape[0] - 1
+    recommendations = model.recommend(last_id,
+                                      dataset_new,
+                                      recalculate_user=True,
+                                      )
+    return dataset.columns[list(np.array(recommendations)[:, 0].astype('int'))]
+
 
 def on_request(ch, method, props, body):
     user_id = int(body)
@@ -56,7 +72,13 @@ class RpcClient(object):
         return self.response
 
 
-time.sleep(20)
+with open('data/final.pkl', 'rb') as f:
+    dataset = pickle.load(f)
+dataset_s = sparse.csr_matrix(dataset.to_coo())
+
+with open('data/model.pkl', 'rb') as f:
+    model = pickle.load(f)
+
 connection = pika.BlockingConnection(pika.ConnectionParameters(host='queue'))
 channel = connection.channel()
 channel.queue_declare(queue='rpc_recommendations')
