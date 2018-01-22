@@ -1,5 +1,6 @@
 # Music recommendation service
 This project is intended to help users to find new interesting music bands based on their vk.com profile.
+
 It's simple: send your user_id and get a recommendation of 10 music bands which will likely meet your taste.
 
 ## Under the hood system has 4 main parts:
