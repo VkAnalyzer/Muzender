@@ -14,3 +14,20 @@ We use vk_api implementation but it's quite limited and took about 15 seconds to
 RabbitMQ as queue manager. Really easy to work with and functional, it supports RPC which is crucial for this project.
 
 All services run in Docker containers and we use docker compose for orchestration. This allows to deploy and run all services with a single command, test different solutions in parallel and balance loads in future. Also as a big plus, all the package and service settings are in the text format so it's easy to configure and keep configurations in version control system.
+
+## Quick start:
+- get data:
+We use Million Song Dataset and Echo Nest user-music rating dataset. 
+Download these tables to  Vk_user_analyzer/data/ (you will find links in dataset_sources.txt file of this folder).
+
+- preprocess data:
+Run Vk_user_analyzer/model_creation/dataset_assembly.ipynb to reformat data to apropriate format.
+
+- train model:
+Run Vk_user_analyzer/model_creation/basic_recommender.ipynb model will be stored in recommedation_service/data/model.pkl file.
+
+- start service:
+cd to root folder of the project and run: docker-compose up --build .
+
+- get your recommendation:
+just open http://localhost:8000 in your browser and enter vk.com user id (only numbers)
