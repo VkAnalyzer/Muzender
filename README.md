@@ -26,6 +26,9 @@ Run Vk_user_analyzer/model_creation/dataset_assembly.ipynb to reformat data to a
 - train model:
 Run Vk_user_analyzer/model_creation/basic_recommender.ipynb model will be stored in recommedation_service/data/model.pkl file.
 
+- setup vk account for parser:
+create dictionary with 'login' and 'password' and dump it to pickle version 3 to parser/secret.pkl
+
 - start service:
 cd to root folder of the project and run: docker-compose up --build .
 
