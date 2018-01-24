@@ -27,10 +27,11 @@ def predict(user_id):
 
 
 def on_request(ch, method, props, body):
-    user_id = int(body)
-
-    print("recommendation for user", user_id)
-    response = predict(user_id)
+    try:
+        user_id = int(body)
+        response = predict(user_id)
+    except ValueError:
+        response = 'Please use only numerical id'
 
     ch.basic_publish(exchange='',
                      routing_key=props.reply_to,
