@@ -27,11 +27,7 @@ def predict(user_id):
 
 
 def on_request(ch, method, props, body):
-    try:
-        user_id = int(body)
-        response = predict(user_id)
-    except ValueError:
-        response = 'Please use only numerical id'
+    response = predict(body.decode("utf-8"))
 
     ch.basic_publish(exchange='',
                      routing_key=props.reply_to,
