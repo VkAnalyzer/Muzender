@@ -15,7 +15,21 @@ RabbitMQ as queue manager. Really easy to work with and functional, it supports 
 
 All services run in Docker containers and we use docker compose for orchestration. This allows to deploy and run all services with a single command, test different solutions in parallel and balance loads in future. Also as a big plus, all the package and service settings are in the text format so it's easy to configure and keep configurations in version control system.
 
-## Quick start:
+## Super quick start:
+- download [model.pkl](https://drive.google.com/open?id=1DfQoraube1tpEtvjUmq9Ue-pBXHJiiih) (250MB) to recommedation_service/data/
+
+- download [final.pkl](https://drive.google.com/open?id=1LouDVmJWfbw__KM2hQ5YT_3dKFTAm1_9) (540MB) to recommedation_service/data/
+
+- setup vk account for parser:
+create dictionary with 'login' and 'password' keys and enter your values and dump it to pickle version 3 to parser/secret.pkl
+
+- start service:
+cd to root folder of the project and run: docker-compose up --build .
+
+- get your recommendation:
+just open http://localhost:8000 in your browser and enter vk.com user id (only numbers)
+
+## Quick start (build dataset and train model from scratch):
 - get data:
 We use Million Song Dataset and Echo Nest user-music rating dataset. 
 Download these tables to  Vk_user_analyzer/data/ (you will find links in dataset_sources.txt file of this folder).
