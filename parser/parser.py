@@ -7,6 +7,7 @@ import vk_api
 from vk_api.audio import VkAudio
 
 
+# TODO: собрать все в класс
 def connect_vk(login, password):
     vk_session = vk_api.VkApi(login, password)
 
