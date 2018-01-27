@@ -7,3 +7,4 @@ parser/vk_config.v2.json
 *.ipynb_checkpoints/
 data/*
 scratchpad/*
+recommedation_service/data/*
