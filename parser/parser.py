@@ -50,7 +50,11 @@ def get_users_audio(session, vk_page):
 def on_request(ch, method, props, body):
 
     user_id = get_user_id(body.decode("utf-8"))
-    response = get_users_audio(vk_session, user_id)
+
+    try:
+        response = get_users_audio(vk_session, user_id)
+    except vk_api.AccessDenied:
+        response = None
     print("parsed page of user", user_id)
 
     ch.basic_publish(exchange='',

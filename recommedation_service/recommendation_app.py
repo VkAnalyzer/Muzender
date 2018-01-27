@@ -14,12 +14,17 @@ def predict(user_id):
     response = parser.call(user_id)
     user_music = pickle.loads(response)
 
+    if user_music is None:
+        return "Sorry, you closed access to your music collection."
+    if len(user_music) == 0:
+        return "No such user or empty music collection."
+
     artists = list(pd.DataFrame(user_music)['artist'])
     user_items = np.zeros(dataset.shape[1])
     user_items[dataset.columns.isin(artists)] = 1
 
     dataset_new = sparse.vstack((dataset_s,
-                                sparse.csr_matrix(user_items)))
+                                 sparse.csr_matrix(user_items)))
     last_id = dataset_new.shape[0] - 1
     recommendations = np.array(model.recommend(last_id,
                                                dataset_new,
