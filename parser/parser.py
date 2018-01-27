@@ -9,13 +9,13 @@ from vk_api.audio import VkAudio
 
 # TODO: собрать все в класс
 def connect_vk(login, password):
-    vk_session = vk_api.VkApi(login, password)
+    session = vk_api.VkApi(login, password)
 
     try:
-        vk_session.auth()
+        session.auth()
     except vk_api.AuthError as error_msg:
         print(error_msg)
-    return vk_session
+    return session
 
 
 def get_user_id(link):
@@ -29,8 +29,8 @@ def get_user_id(link):
     return int(user_id)
 
 
-def get_users_audio(vk_session, vk_page):
-    vkaudio = VkAudio(vk_session)
+def get_users_audio(session, vk_page):
+    vkaudio = VkAudio(session)
 
     all_audios = []
     offset = 0
@@ -62,9 +62,7 @@ def on_request(ch, method, props, body):
 
 with open('secret.pkl', mode='rb') as f:
     secret = pickle.load(f)
-login = secret['login']
-password = secret['password']
-vk_session = connect_vk(login, password)
+vk_session = connect_vk(secret['login'], secret['password'])
 vk = vk_session.get_api()
 
 time.sleep(15)

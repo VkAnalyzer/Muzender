@@ -1,6 +1,5 @@
 import pika
 import uuid
-import time
 import pickle
 from scipy import sparse
 import implicit
@@ -12,7 +11,7 @@ def predict(user_id):
     n_recommendations = 5
     novely_level = 9
 
-    response = recommender.call(user_id)
+    response = parser.call(user_id)
     user_music = pickle.loads(response)
 
     artists = list(pd.DataFrame(user_music)['artist'])
@@ -33,7 +32,8 @@ def predict(user_id):
     for artist in artists:
         popularity.append(dataset.iloc[:, artist].count() / user_count)
 
-    artist_rating = recommendations[:, 1] * (1 - np.array(popularity) * novely_level * 6)
+    artist_rating = (recommendations[:, 1]
+                     * (1 - np.array(popularity) * novely_level * 6))
     recommendation_indexes = artist_rating.argsort()[-n_recommendations:][::-1]
     return list(dataset
                 .columns[recommendations[recommendation_indexes, 0]
@@ -97,7 +97,7 @@ channel.queue_declare(queue='rpc_recommendations')
 channel.basic_qos(prefetch_count=1)
 channel.basic_consume(on_request, queue='rpc_recommendations')
 
-recommender = RpcClient()
+parser = RpcClient()
 
 print("recommendation service ready")
 channel.start_consuming()
