@@ -9,6 +9,9 @@ import numpy as np
 
 
 def predict(user_id):
+    n_recommendations = 5
+    novely_level = 9
+
     response = recommender.call(user_id)
     user_music = pickle.loads(response)
 
@@ -19,11 +22,22 @@ def predict(user_id):
     dataset_new = sparse.vstack((dataset_s,
                                 sparse.csr_matrix(user_items)))
     last_id = dataset_new.shape[0] - 1
-    recommendations = model.recommend(last_id,
-                                      dataset_new,
-                                      recalculate_user=True,
-                                      )
-    return dataset.columns[list(np.array(recommendations)[:, 0].astype('int'))]
+    recommendations = np.array(model.recommend(last_id,
+                                               dataset_new,
+                                               recalculate_user=True,
+                                               N=80
+                                               ))
+    user_count = len(dataset)
+    popularity = []
+    artists = recommendations[:, 0].astype(int)
+    for artist in artists:
+        popularity.append(dataset.iloc[:, artist].count() / user_count)
+
+    artist_rating = recommendations[:, 1] * (1 - np.array(popularity) * novely_level * 6)
+    recommendation_indexes = artist_rating.argsort()[-n_recommendations:][::-1]
+    return list(dataset
+                .columns[recommendations[recommendation_indexes, 0]
+                .astype('int')])
 
 
 def on_request(ch, method, props, body):
