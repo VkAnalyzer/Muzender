@@ -10,15 +10,31 @@ def echo(bot, update):
 
     if 'vk.com/' in sent:
         sent = sent.split('/')[-1]
-    if sent.replace('id', '').isdigit():
-        sent = sent.replace('id', '')
         bot.sendMessage(chat_id=update.message.chat_id,
                         text='I need a minute to think about it')
         answer = recommender.call(sent)
-    else:
-        answer = """Hi there, if you show me your vk.com profile, I will recommend you some cool music. Just drop the link."""
 
-    bot.sendMessage(chat_id=update.message.chat_id, text=answer)
+        answer = (answer.replace('\\', '')
+                        .replace(']', '')
+                        .replace('[', '')
+                        .replace('\'', '')
+                        .split(','))
+
+        bot.sendMessage(chat_id=update.message.chat_id,
+                        text='Check this out:')
+
+        if type(answer) is list:
+            for artist in answer:
+                artist = artist.lstrip()
+
+                message = (artist + '\n' +
+                           'https://music.yandex.ru/search?text='
+                           + artist.replace(' ', '%20')
+                           + '&type=artists')
+                bot.sendMessage(chat_id=update.message.chat_id, text=message)
+    else:
+        message = """Hi there, if you show me your vk.com profile, I will recommend you some cool music. Just drop the link."""
+        bot.sendMessage(chat_id=update.message.chat_id, text=message)
 
 
 if __name__ == '__main__':
