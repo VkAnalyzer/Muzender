@@ -38,6 +38,15 @@ services:
       - queue
     restart: on-failure
 
+  tg_bot:
+    build: ./tg_bot
+    command: python3 bot.py runserver 0.0.0.0:8000
+    depends_on:
+      - queue
+    networks:
+      - queue
+    restart: on-failure
+
 networks:
   queue:
     driver: bridge
