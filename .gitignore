@@ -8,3 +8,4 @@ parser/vk_config.v2.json
 data/*
 scratchpad/*
 recommedation_service/data/*
+tg_bot/token.pkl
