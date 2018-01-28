@@ -4,16 +4,15 @@ from telegram.ext import MessageHandler, Filters
 import pickle
 
 
-
 def echo(bot, update):
     sent = update.message.text.strip().lower()
 
-    if sent in ['2', '4']:
-        answer = 'even'
-    elif sent in ['1', '3']:
-        answer = 'odd'
+    if 'vk.com/' in sent:
+        sent = sent.split('/')[-1]
+    if sent.replace('id', '').isdigit():
+        answer = sent.replace('id', '')
     else:
-        answer = 'I dont know this number'
+        answer = """Hi there, if you show me your vk.com profile, I will recommend you some cool music. Just drop the link."""
 
     bot.sendMessage(chat_id=update.message.chat_id, text=answer)
 
