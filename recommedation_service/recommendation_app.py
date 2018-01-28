@@ -23,11 +23,10 @@ def predict(user_id):
     user_items = np.zeros(len(artist_names))
     user_items[artist_names.isin(artists)] = 1
 
-    dataset_new = sparse.vstack((dataset_s,
-                                 sparse.csr_matrix(user_items)))
-    last_id = dataset_new.shape[0] - 1
+    last_id = dataset_s.shape[0]  # last id+1
     recommendations = np.array(model.recommend(last_id,
-                                               dataset_new,
+                                               sparse.vstack((dataset_s,
+                                                              sparse.csr_matrix(user_items))),
                                                recalculate_user=True,
                                                N=80
                                                ))
