@@ -6,6 +6,8 @@ It's simple: send your user_id and get a recommendation of 10 music bands which 
 ## Under the hood system has 4 main parts:
 - UI:
 Django based web server.
+- Telegram bot:
+just start chat with @Muzender_bot
 - recommendation model:
 We use Implicit ALS implementation it's blazing fast and support online recommendation without recalculation of the whole user-item matrix. After some optimizations, recommendation for new user takes less than 0.5 seconds.
 - vk.com user page parser:
