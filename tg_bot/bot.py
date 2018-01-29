@@ -14,24 +14,28 @@ def echo(bot, update):
                         text='I need a minute to think about it')
         answer = recommender.call(sent)
 
-        answer = (answer.replace('\\', '')
-                        .replace(']', '')
-                        .replace('[', '')
-                        .replace('\'', '')
-                        .split(','))
+        if answer == 'Sorry, you closed access to your music collection.':
+            bot.sendMessage(chat_id=update.message.chat_id,
+                            text=answer)
+        else:
+            answer = (answer.replace('\\', '')
+                            .replace(']', '')
+                            .replace('[', '')
+                            .replace('\'', '')
+                            .split(','))
 
-        bot.sendMessage(chat_id=update.message.chat_id,
-                        text='Check this out:')
+            bot.sendMessage(chat_id=update.message.chat_id,
+                            text='Check this out:')
 
-        if type(answer) is list:
-            for artist in answer:
-                artist = artist.lstrip()
+            if type(answer) is list:
+                for artist in answer:
+                    artist = artist.lstrip()
 
-                message = (artist + '\n' +
-                           'https://music.yandex.ru/search?text='
-                           + artist.replace(' ', '%20')
-                           + '&type=artists')
-                bot.sendMessage(chat_id=update.message.chat_id, text=message)
+                    message = (artist + '\n' +
+                               'https://music.yandex.ru/search?text='
+                               + artist.replace(' ', '%20')
+                               + '&type=artists')
+                    bot.sendMessage(chat_id=update.message.chat_id, text=message)
     else:
         message = """Hi there, if you show me your vk.com profile, I will recommend you some cool music. Just drop the link."""
         bot.sendMessage(chat_id=update.message.chat_id, text=message)
