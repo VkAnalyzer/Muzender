@@ -40,7 +40,7 @@ services:
 
   tg_bot:
     build: ./tg_bot
-    command: python3 bot.py runserver 0.0.0.0:8000
+    command: python3 bot.py
     depends_on:
       - queue
     networks:
