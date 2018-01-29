@@ -9,6 +9,7 @@ def echo(bot, update):
     sent = update.message.text.strip().lower()
 
     if 'vk.com/' in sent:
+        recommender = rc.RpcClient()
         sent = sent.split('/')[-1]
         bot.sendMessage(chat_id=update.message.chat_id,
                         text='I need a minute to think about it')
@@ -19,10 +20,10 @@ def echo(bot, update):
                             text=answer)
         else:
             answer = (answer.replace('\\', '')
-                            .replace(']', '')
-                            .replace('[', '')
-                            .replace('\'', '')
-                            .split(','))
+                .replace(']', '')
+                .replace('[', '')
+                .replace('\'', '')
+                .split(','))
 
             bot.sendMessage(chat_id=update.message.chat_id,
                             text='Check this out:')
@@ -42,7 +43,6 @@ def echo(bot, update):
 
 
 if __name__ == '__main__':
-    recommender = rc.RpcClient()
     with open('token.pkl', 'rb') as f:
         token = pickle.load(f)
 
