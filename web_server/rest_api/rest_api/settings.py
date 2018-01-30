@@ -26,7 +26,7 @@ SECRET_KEY = ''.join([random.SystemRandom().choice("{}{}{}".format(string.ascii_
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['139.59.146.94', 'localhost']
 
 
 # Application definition

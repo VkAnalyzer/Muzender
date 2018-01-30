@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 services:
   queue:
     image: rabbitmq:3.7.2-management
@@ -32,6 +32,15 @@ services:
     command: python3 rest_api/manage.py runserver 0.0.0.0:8000
     ports:
       - "8000:8000"
+    depends_on:
+      - queue
+    networks:
+      - queue
+    restart: on-failure
+
+  tg_bot:
+    build: ./tg_bot
+    command: python3 bot.py
     depends_on:
       - queue
     networks:
