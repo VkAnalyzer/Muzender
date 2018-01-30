@@ -22,7 +22,7 @@ All services run in Docker containers and we use docker compose for orchestratio
 
 - download [dataset.pkl](https://drive.google.com/open?id=1O9dLiuV873pm-MjChUKl_KNQGoFHm1yo) (360MB) to recommedation_service/data/
 
-- download [artist_names.pkl](https://drive.google.com/open?id=1O9dLiuV873pm-MjChUKl_KNQGoFHm1yo) (1MB) to recommedation_service/data/
+- download [artist_names.pkl](https://drive.google.com/open?id=1B34f7zOQ83-LvN9nc-Jb2rEtnvKcy88d) (1MB) to recommedation_service/data/
 
 - setup vk account for parser:
 create dictionary with 'login' and 'password' keys and enter your values and dump it to pickle version 3 to parser/secret.pkl
