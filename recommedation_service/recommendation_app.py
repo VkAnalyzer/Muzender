@@ -87,23 +87,24 @@ class RpcClient(object):
         return self.response
 
 
-with open('data/dataset.pkl', 'rb') as f:
-    dataset_s = pickle.load(f)
+if __name__ == '__main__':
+    with open('data/dataset.pkl', 'rb') as f:
+        dataset_s = pickle.load(f)
 
-with open('data/artist_names.pkl', 'rb') as f:
-    artist_names = pickle.load(f)
+    with open('data/artist_names.pkl', 'rb') as f:
+        artist_names = pickle.load(f)
 
-with open('data/model.pkl', 'rb') as f:
-    model = pickle.load(f)
+    with open('data/model.pkl', 'rb') as f:
+        model = pickle.load(f)
 
-connection = pika.BlockingConnection(pika.ConnectionParameters(host='queue'))
-channel = connection.channel()
-channel.queue_declare(queue='rpc_recommendations')
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host='queue'))
+    channel = connection.channel()
+    channel.queue_declare(queue='rpc_recommendations')
 
-channel.basic_qos(prefetch_count=1)
-channel.basic_consume(on_request, queue='rpc_recommendations')
+    channel.basic_qos(prefetch_count=1)
+    channel.basic_consume(on_request, queue='rpc_recommendations')
 
-parser = RpcClient()
+    parser = RpcClient()
 
-print("recommendation service ready")
-channel.start_consuming()
+    print("recommendation service ready")
+    channel.start_consuming()

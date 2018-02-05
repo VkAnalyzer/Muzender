@@ -64,18 +64,19 @@ def on_request(ch, method, props, body):
     ch.basic_ack(delivery_tag=method.delivery_tag)
 
 
-with open('secret.pkl', mode='rb') as f:
-    secret = pickle.load(f)
-vk_session = connect_vk(secret['login'], secret['password'])
-vk = vk_session.get_api()
+if __name__ == '__main__':
+    with open('secret.pkl', mode='rb') as f:
+        secret = pickle.load(f)
+    vk_session = connect_vk(secret['login'], secret['password'])
+    vk = vk_session.get_api()
 
-time.sleep(15)
-connection = pika.BlockingConnection(pika.ConnectionParameters(host='queue'))
-channel = connection.channel()
-channel.queue_declare(queue='rpc_user_music')
+    time.sleep(15)
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host='queue'))
+    channel = connection.channel()
+    channel.queue_declare(queue='rpc_user_music')
 
-channel.basic_qos(prefetch_count=1)
-channel.basic_consume(on_request, queue='rpc_user_music')
+    channel.basic_qos(prefetch_count=1)
+    channel.basic_consume(on_request, queue='rpc_user_music')
 
-print("parsing service ready")
-channel.start_consuming()
+    print("parsing service ready")
+    channel.start_consuming()
