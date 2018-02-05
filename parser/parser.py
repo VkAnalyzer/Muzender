@@ -1,58 +1,58 @@
 import collections
 import pickle
 import pika
-import time
 import bs4
 import vk_api
 from vk_api.audio import VkAudio
 
 
-# TODO: собрать все в класс
-def connect_vk(login, password):
-    session = vk_api.VkApi(login, password)
+class VkParser(object):
+    def __init__(self):
+        with open('secret.pkl', mode='rb') as f:
+            secret = pickle.load(f)
+        self.vk_session = self.connect_vk(secret['login'], secret['password'])
+        self.vk = self.vk_session.get_api()
 
-    try:
-        session.auth()
-    except vk_api.AuthError as error_msg:
-        print(error_msg)
-    return session
+    def connect_vk(self, login, password):
+        session = vk_api.VkApi(login, password)
+        try:
+            session.auth()
+        except vk_api.AuthError as error_msg:
+            print(error_msg)
+        return session
 
+    def get_user_id(self, link):
+        if 'vk.com/' in link:
+            link = link.split('/')[-1]
+        if link.replace('id', '').isdigit():
+            user_id = link.replace('id', '')
+        else:
+            user_id = self.vk.utils.resolveScreenName(screen_name=link)['object_id']
+        return int(user_id)
 
-def get_user_id(link):
-    if 'vk.com/' in link:
-        link = link.split('/')[-1]
-    if link.replace('id', '').isdigit():
-        user_id = link.replace('id', '')
-    else:
-        user_id = vk.utils.resolveScreenName(screen_name=link)['object_id']
+    def get_users_audio(self, session, vk_page):
+        vkaudio = VkAudio(session)
 
-    return int(user_id)
+        all_audios = []
+        offset = 0
 
+        while True:
+            audios = vkaudio.get(owner_id=vk_page, offset=offset)
+            all_audios.append(audios)
+            offset += len(audios)
 
-def get_users_audio(session, vk_page):
-    vkaudio = VkAudio(session)
+            if not audios:
+                break
 
-    all_audios = []
-    offset = 0
-
-    while True:
-        audios = vkaudio.get(owner_id=vk_page, offset=offset)
-        all_audios.append(audios)
-        offset += len(audios)
-
-        if not audios:
-            break
-
-    all_audios = sum(all_audios, [])
-    return all_audios
+        all_audios = sum(all_audios, [])
+        return all_audios
 
 
 def on_request(ch, method, props, body):
-
-    user_id = get_user_id(body.decode("utf-8"))
+    user_id = parser.get_user_id(link=body.decode("utf-8"))
 
     try:
-        response = get_users_audio(vk_session, user_id)
+        response = parser.get_users_audio(session=parser.vk_session, vk_page=user_id)
     except vk_api.AccessDenied:
         response = None
     print("parsed page of user", user_id)
@@ -65,12 +65,8 @@ def on_request(ch, method, props, body):
 
 
 if __name__ == '__main__':
-    with open('secret.pkl', mode='rb') as f:
-        secret = pickle.load(f)
-    vk_session = connect_vk(secret['login'], secret['password'])
-    vk = vk_session.get_api()
+    parser = VkParser()
 
-    time.sleep(15)
     connection = pika.BlockingConnection(pika.ConnectionParameters(host='queue'))
     channel = connection.channel()
     channel.queue_declare(queue='rpc_user_music')
