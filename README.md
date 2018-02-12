@@ -27,6 +27,9 @@ All services run in Docker containers and we use docker compose for orchestratio
 - setup vk account for parser:
 create dictionary with 'login' and 'password' keys and enter your values and dump it to pickle version 3 to parser/secret.pkl
 
+- setup telegram bot token:
+pickle string with bot token and dump it to tg_bot/token.pkl 
+
 - start service:
 cd to root folder of the project and run: docker-compose up --build .
 
