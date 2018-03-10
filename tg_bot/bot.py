@@ -30,10 +30,10 @@ def echo(bot, update):
                             text=answer)
         else:
             answer = (answer.replace('\\', '')
-                .replace(']', '')
-                .replace('[', '')
-                .replace('\'', '')
-                .split(','))
+                      .replace(']', '')
+                      .replace('[', '')
+                      .replace('\'', '')
+                      .split(','))
 
             bot.sendMessage(chat_id=update.message.chat_id,
                             text='Check this out:')
