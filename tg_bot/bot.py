@@ -9,10 +9,10 @@ from recommedation_client import recommedation_client as rc
 
 def start(bot, update):
     message = """Hi there, if you show me your vk.com profile, I will recommend you some cool music. Just drop the link."""
-
     bot.sendMessage(chat_id=update.message.chat_id,
                     text=message,
                     )
+    user_preferences[update.message.chat_id] = {'novelty_level': 9}
 
 
 def echo(bot, update):
@@ -63,9 +63,11 @@ def echo(bot, update):
                                 reply_markup=markup,
                                 )
     elif sent == 'more accurate':
-        pass
+        curr_novelty_level = user_preferences[update.message.chat_id]['novelty_level']
+        user_preferences[update.message.chat_id]['novelty_level'] = int(curr_novelty_level / 2)
     elif sent == 'less obvious':
-        pass
+        curr_novelty_level = user_preferences[update.message.chat_id]['novelty_level']
+        user_preferences[update.message.chat_id]['novelty_level'] = int(curr_novelty_level * 2)
     elif sent == 'i like it!':
         bot.sendMessage(chat_id=update.message.chat_id, text='Thanks!')
     else:
@@ -77,6 +79,7 @@ if __name__ == '__main__':
     with open('token.pkl', 'rb') as f:
         token = pickle.load(f)
 
+    user_preferences = {}
     updater = Updater(token=token)
     dispatcher = updater.dispatcher
     echo_handler = MessageHandler(Filters.text, echo)
