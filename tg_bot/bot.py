@@ -11,6 +11,7 @@ MIN_NOVELTY_LEVEL = 1
 MAX_NOVELTY_LEVEL = 150
 DEFAULT_NOVELTY_LEVEL = 8
 
+
 def start(bot, update):
     message = """Hi there, if you show me your vk.com profile, I will recommend you some cool music. Just drop the link."""
     bot.sendMessage(chat_id=update.message.chat_id,
@@ -18,20 +19,11 @@ def start(bot, update):
                     )
 
 
-def give_recommendation(sent, curr_novelty_level, bot, update):
-    if sent is None:
-        try:
-            vk_id = user_preferences[update.message.chat_id]['vk_id']
-        except KeyError:
-            bot.sendMessage(chat_id=update.message.chat_id, text='Good, now give me the link to your vk.com page')
-            return
-    else:
-        vk_id = sent.split('/')[-1]
-        user_preferences[update.message.chat_id]['vk_id'] = vk_id
+def give_recommendation(bot, update):
     recommender = rc.RpcClient()
     bot.sendMessage(chat_id=update.message.chat_id,
                     text='I need a minute to think about it')
-    answer = recommender.call([vk_id, curr_novelty_level])
+    answer = recommender.call(user_preferences[update.message.chat_id])
 
     if answer == 'Sorry, you closed access to your music collection.':
         bot.sendMessage(chat_id=update.message.chat_id,
@@ -73,28 +65,26 @@ def give_recommendation(sent, curr_novelty_level, bot, update):
 
 
 def echo(bot, update):
-    try:
-        curr_novelty_level = user_preferences[update.message.chat_id]['novelty_level']
-    except KeyError:
-        user_preferences[update.message.chat_id] = {'novelty_level': 9}
-        curr_novelty_level = DEFAULT_NOVELTY_LEVEL
-
     sent = update.message.text.strip().lower()
 
     if 'vk.com/' in sent:
-        give_recommendation(sent, curr_novelty_level, bot, update)
-    elif sent == 'more accurate':
-        curr_novelty_level = user_preferences[update.message.chat_id]['novelty_level']
-        user_preferences[update.message.chat_id]['novelty_level'] = max(int(curr_novelty_level / 2),
-                                                                        MIN_NOVELTY_LEVEL)
-        give_recommendation(None, curr_novelty_level, bot, update)
-    elif sent == 'less obvious':
-        curr_novelty_level = user_preferences[update.message.chat_id]['novelty_level']
-        user_preferences[update.message.chat_id]['novelty_level'] = min(int(curr_novelty_level * 2),
-                                                                        MAX_NOVELTY_LEVEL)
-        give_recommendation(None, curr_novelty_level, bot, update)
-    elif sent == 'i like it!':
-        bot.sendMessage(chat_id=update.message.chat_id, text='Thanks!')
+        vk_id = sent.split('/')[-1]
+        user_preferences[update.message.chat_id] = {'user_id': vk_id,
+                                                    'novelty_level': DEFAULT_NOVELTY_LEVEL}
+        give_recommendation(bot, update)
+    elif update.message.chat_id in user_preferences.keys():
+        if sent == 'more accurate':
+            curr_novelty_level = user_preferences[update.message.chat_id]['novelty_level']
+            user_preferences[update.message.chat_id]['novelty_level'] = max(int(curr_novelty_level / 2),
+                                                                            MIN_NOVELTY_LEVEL)
+            give_recommendation(bot, update)
+        elif sent == 'less obvious':
+            curr_novelty_level = user_preferences[update.message.chat_id]['novelty_level']
+            user_preferences[update.message.chat_id]['novelty_level'] = min(int(curr_novelty_level * 2),
+                                                                            MAX_NOVELTY_LEVEL)
+            give_recommendation(bot, update)
+        elif sent == 'i like it!':
+            bot.sendMessage(chat_id=update.message.chat_id, text='Thanks!')
     else:
         message = """Please, show me your vk.com profile, I will recommend you some cool music. Just drop the link."""
         bot.sendMessage(chat_id=update.message.chat_id, text=message)

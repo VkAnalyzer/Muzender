@@ -9,11 +9,7 @@ from rpc_client import RpcClient
 
 def on_request(ch, method, props, body):
     body = pickle.loads(body)
-    # TODO: make body dictionary and pass dict to function
-    if len(body) == 2:
-        response = model.predict(user_id=body[0], novely_level=body[1])
-    else:
-        response = model.predict(body[0])
+    response = model.predict(**body)
 
     ch.basic_publish(exchange='',
                      routing_key=props.reply_to,
@@ -24,7 +20,7 @@ def on_request(ch, method, props, body):
 
 
 class Recommender(object):
-    def __init__(self, n_recommendations=5, novely_level=9):
+    def __init__(self, n_recommendations=5, novelty_level=9):
         with open('data/dataset.pkl', 'rb') as f:
             self.dataset_s = pickle.load(f)
 
@@ -35,11 +31,11 @@ class Recommender(object):
             self.model = pickle.load(f)
 
         self.n_recommendations = n_recommendations
-        self.novely_level = novely_level
+        self.novelty_level = novelty_level
 
-    def predict(self, user_id, novely_level=None):
-        if novely_level is None:
-            novely_level = self.novely_level
+    def predict(self, user_id, novelty_level=None):
+        if novelty_level is None:
+            novelty_level = self.novelty_level
         response = parser.call(user_id)
         user_music = user_music = pickle.loads(response)
 
@@ -67,7 +63,7 @@ class Recommender(object):
             popularity.append(temp_dataset[:, artist].count_nonzero() / user_count)
 
         artist_rating = (recommendations[:, 1]
-                         * (1 - np.array(popularity) * novely_level * 6))
+                         * (1 - np.array(popularity) * novelty_level * 6))
         recommendation_indexes = artist_rating.argsort()[-self.n_recommendations:][::-1]
         return list(self.artist_names[recommendations[recommendation_indexes, 0]
                     .astype('int')])
