@@ -1,7 +1,7 @@
 import uuid
 import pika
 
-
+# TODO: use it in all apps
 class RpcClient(object):
     def __init__(self, host, routing_key):
         self.routing_key = routing_key
