@@ -73,17 +73,13 @@ def echo(bot, update):
                                 )
     elif sent == 'more accurate':
         curr_novelty_level = user_preferences[update.message.chat_id]['novelty_level']
-        user_preferences[update.message.chat_id]['novelty_level'] = int(curr_novelty_level / 2)
-        if user_preferences[update.message.chat_id]['novelty_level'] < MIN_NOVELTY_LEVEL:
-            user_preferences[update.message.chat_id]['novelty_level'] = MIN_NOVELTY_LEVEL
+        user_preferences[update.message.chat_id]['novelty_level'] = max(int(curr_novelty_level / 2),
+                                                                        MIN_NOVELTY_LEVEL)
         # TODO: set default novelty level
     elif sent == 'less obvious':
         curr_novelty_level = user_preferences[update.message.chat_id]['novelty_level']
-        user_preferences[update.message.chat_id]['novelty_level'] = int(curr_novelty_level * 2)
-        if user_preferences[update.message.chat_id]['novelty_level'] > MAX_NOVELTY_LEVEL:
-            user_preferences[update.message.chat_id]['novelty_level'] = MAX_NOVELTY_LEVEL
-
-        # TODO: set max novelty level
+        user_preferences[update.message.chat_id]['novelty_level'] = min(int(curr_novelty_level * 2),
+                                                                        MAX_NOVELTY_LEVEL)
     elif sent == 'i like it!':
         bot.sendMessage(chat_id=update.message.chat_id, text='Thanks!')
     else:
