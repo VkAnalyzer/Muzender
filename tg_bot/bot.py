@@ -9,6 +9,7 @@ from recommedation_client import recommedation_client as rc
 
 MIN_NOVELTY_LEVEL = 1
 MAX_NOVELTY_LEVEL = 150
+DEFAULT_NOVELTY_LEVEL = 8
 
 def start(bot, update):
     message = """Hi there, if you show me your vk.com profile, I will recommend you some cool music. Just drop the link."""
@@ -74,10 +75,9 @@ def give_recommendation(sent, curr_novelty_level, bot, update):
 def echo(bot, update):
     try:
         curr_novelty_level = user_preferences[update.message.chat_id]['novelty_level']
-    except:
+    except KeyError:
         user_preferences[update.message.chat_id] = {'novelty_level': 9}
-        curr_novelty_level = 9
-        # TODO: set default novelty level somewhere
+        curr_novelty_level = DEFAULT_NOVELTY_LEVEL
 
     sent = update.message.text.strip().lower()
 
@@ -88,7 +88,6 @@ def echo(bot, update):
         user_preferences[update.message.chat_id]['novelty_level'] = max(int(curr_novelty_level / 2),
                                                                         MIN_NOVELTY_LEVEL)
         give_recommendation(None, curr_novelty_level, bot, update)
-        # TODO: set default novelty level
     elif sent == 'less obvious':
         curr_novelty_level = user_preferences[update.message.chat_id]['novelty_level']
         user_preferences[update.message.chat_id]['novelty_level'] = min(int(curr_novelty_level * 2),
