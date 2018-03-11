@@ -7,15 +7,24 @@ import pickle
 from recommedation_client import recommedation_client as rc
 
 
+MIN_NOVELTY_LEVEL = 1
+MAX_NOVELTY_LEVEL = 150
+
 def start(bot, update):
     message = """Hi there, if you show me your vk.com profile, I will recommend you some cool music. Just drop the link."""
     bot.sendMessage(chat_id=update.message.chat_id,
                     text=message,
                     )
-    user_preferences[update.message.chat_id] = {'novelty_level': 9}
 
 
 def echo(bot, update):
+    try:
+        curr_novelty_level = user_preferences[update.message.chat_id]['novelty_level']
+    except:
+        user_preferences[update.message.chat_id] = {'novelty_level': 9}
+        curr_novelty_level = 9
+        # TODO: set default novelty level somewhere
+
     sent = update.message.text.strip().lower()
 
     if 'vk.com/' in sent:
@@ -23,7 +32,7 @@ def echo(bot, update):
         sent = sent.split('/')[-1]
         bot.sendMessage(chat_id=update.message.chat_id,
                         text='I need a minute to think about it')
-        answer = recommender.call(sent)
+        answer = recommender.call([sent, curr_novelty_level])
 
         if answer == 'Sorry, you closed access to your music collection.':
             bot.sendMessage(chat_id=update.message.chat_id,
@@ -65,14 +74,22 @@ def echo(bot, update):
     elif sent == 'more accurate':
         curr_novelty_level = user_preferences[update.message.chat_id]['novelty_level']
         user_preferences[update.message.chat_id]['novelty_level'] = int(curr_novelty_level / 2)
+        if user_preferences[update.message.chat_id]['novelty_level'] < MIN_NOVELTY_LEVEL:
+            user_preferences[update.message.chat_id]['novelty_level'] = MIN_NOVELTY_LEVEL
+        # TODO: set default novelty level
     elif sent == 'less obvious':
         curr_novelty_level = user_preferences[update.message.chat_id]['novelty_level']
         user_preferences[update.message.chat_id]['novelty_level'] = int(curr_novelty_level * 2)
+        if user_preferences[update.message.chat_id]['novelty_level'] > MAX_NOVELTY_LEVEL:
+            user_preferences[update.message.chat_id]['novelty_level'] = MAX_NOVELTY_LEVEL
+
+        # TODO: set max novelty level
     elif sent == 'i like it!':
         bot.sendMessage(chat_id=update.message.chat_id, text='Thanks!')
     else:
         message = """Please, show me your vk.com profile, I will recommend you some cool music. Just drop the link."""
         bot.sendMessage(chat_id=update.message.chat_id, text=message)
+        # TODO: log nice feedback
 
 
 if __name__ == '__main__':

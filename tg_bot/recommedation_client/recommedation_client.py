@@ -1,5 +1,6 @@
 import pika
 import uuid
+import pickle
 
 
 class RpcClient(object):
@@ -27,7 +28,7 @@ class RpcClient(object):
                                          reply_to=self.callback_queue,
                                          correlation_id=self.corr_id,
                                          ),
-                                   body=str(n))
+                                   body=pickle.dumps(n))
         while self.response is None:
             self.connection.process_data_events()
         return self.response

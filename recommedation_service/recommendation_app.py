@@ -8,7 +8,12 @@ from rpc_client import RpcClient
 
 
 def on_request(ch, method, props, body):
-    response = model.predict(body.decode("utf-8"))
+    body = pickle.loads(body)
+    # TODO: make body dictionary and pass dict to function
+    if len(body) == 2:
+        response = model.predict(user_id=body[0], novely_level=body[1])
+    else:
+        response = model.predict(body[0])
 
     ch.basic_publish(exchange='',
                      routing_key=props.reply_to,
@@ -32,9 +37,11 @@ class Recommender(object):
         self.n_recommendations = n_recommendations
         self.novely_level = novely_level
 
-    def predict(self, user_id):
+    def predict(self, user_id, novely_level=None):
+        if novely_level is None:
+            novely_level = self.novely_level
         response = parser.call(user_id)
-        user_music = pickle.loads(response)
+        user_music = user_music = pickle.loads(response)
 
         if user_music is None:
             return "Sorry, you closed access to your music collection."
@@ -60,7 +67,7 @@ class Recommender(object):
             popularity.append(temp_dataset[:, artist].count_nonzero() / user_count)
 
         artist_rating = (recommendations[:, 1]
-                         * (1 - np.array(popularity) * self.novely_level * 6))
+                         * (1 - np.array(popularity) * novely_level * 6))
         recommendation_indexes = artist_rating.argsort()[-self.n_recommendations:][::-1]
         return list(self.artist_names[recommendations[recommendation_indexes, 0]
                     .astype('int')])
