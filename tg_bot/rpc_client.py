@@ -1,14 +1,15 @@
-import pika
 import uuid
+import pika
 import pickle
 
 
 class RpcClient(object):
-    def __init__(self):
+    def __init__(self, host, routing_key):
+        self.routing_key = routing_key
         self.response = None
         self.corr_id = None
 
-        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host='queue'))
+        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host=host))
         self.channel = self.connection.channel()
         result = self.channel.queue_declare(exclusive=True)
         self.callback_queue = result.method.queue
@@ -17,13 +18,13 @@ class RpcClient(object):
 
     def on_response(self, ch, method, props, body):
         if self.corr_id == props.correlation_id:
-            self.response = body.decode("utf-8")
+            self.response = pickle.loads(body)
 
     def call(self, n):
         self.response = None
         self.corr_id = str(uuid.uuid4())
         self.channel.basic_publish(exchange='',
-                                   routing_key='rpc_recommendations',
+                                   routing_key=self.routing_key,
                                    properties=pika.BasicProperties(
                                          reply_to=self.callback_queue,
                                          correlation_id=self.corr_id,

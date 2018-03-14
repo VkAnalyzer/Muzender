@@ -4,7 +4,7 @@ from telegram.ext import MessageHandler, Filters, CommandHandler
 from telegram import bot
 import telegram
 import pickle
-from recommedation_client import recommedation_client as rc
+from rpc_client import RpcClient
 
 
 MIN_NOVELTY_LEVEL = 1
@@ -20,7 +20,8 @@ def start(bot, update):
 
 
 def give_recommendation(bot, update):
-    recommender = rc.RpcClient()
+    # TODO don't drop connection
+    recommender = RpcClient(host='queue', routing_key='rpc_recommendations')
     bot.sendMessage(chat_id=update.message.chat_id,
                     text='I need a minute to think about it')
     answer = recommender.call(user_preferences[update.message.chat_id])
@@ -29,12 +30,6 @@ def give_recommendation(bot, update):
         bot.sendMessage(chat_id=update.message.chat_id,
                         text=answer)
     else:
-        answer = (answer.replace('\\', '')
-                  .replace(']', '')
-                  .replace('[', '')
-                  .replace('\'', '')
-                  .split(','))
-
         bot.sendMessage(chat_id=update.message.chat_id,
                         text='Check this out:')
 
