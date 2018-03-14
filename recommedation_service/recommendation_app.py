@@ -13,8 +13,7 @@ def on_request(ch, method, props, body):
 
     ch.basic_publish(exchange='',
                      routing_key=props.reply_to,
-                     properties=pika.BasicProperties(correlation_id
-                                                     =props.correlation_id),
+                     properties=pika.BasicProperties(correlation_id=props.correlation_id),
                      body=str(response))
     ch.basic_ack(delivery_tag=method.delivery_tag)
 
@@ -37,7 +36,7 @@ class Recommender(object):
         if novelty_level is None:
             novelty_level = self.novelty_level
         response = parser.call(user_id)
-        user_music = user_music = pickle.loads(response)
+        user_music = pickle.loads(response)
 
         if user_music is None:
             return "Sorry, you closed access to your music collection."
@@ -50,11 +49,11 @@ class Recommender(object):
 
         last_id = self.dataset_s.shape[0]  # last id+1
         recommendations = np.array(self.model.recommend(last_id,
-                                                   sparse.vstack((self.dataset_s,
-                                                                  sparse.csr_matrix(user_items))),
-                                                   recalculate_user=True,
-                                                   N=80
-                                                   ))
+                                                        sparse.vstack((self.dataset_s,
+                                                                       sparse.csr_matrix(user_items))),
+                                                        recalculate_user=True,
+                                                        N=80
+                                                        ))
         user_count = self.dataset_s.shape[0]
         popularity = []
         artists = recommendations[:, 0].astype(int)
