@@ -49,7 +49,8 @@ class VkParser(object):
 
 
 def on_request(ch, method, props, body):
-    user_id = parser.get_user_id(link=body.decode("utf-8"))
+    body = pickle.loads(body)
+    user_id = parser.get_user_id(link=body)
 
     try:
         response = parser.get_users_audio(session=parser.vk_session, vk_page=user_id)
