@@ -85,6 +85,10 @@ def echo(bot, update):
             give_recommendation(bot, update)
         elif sent == 'i like it!':
             bot.sendMessage(chat_id=update.message.chat_id, text='Thanks!')
+        else:
+            message = """Please, show me your vk.com profile, I will recommend you some cool music. Just drop the link."""
+            bot.sendMessage(chat_id=update.message.chat_id, text=message)
+            # TODO: log nice feedback
     else:
         message = """Please, show me your vk.com profile, I will recommend you some cool music. Just drop the link."""
         bot.sendMessage(chat_id=update.message.chat_id, text=message)
