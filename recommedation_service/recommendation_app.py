@@ -35,8 +35,7 @@ class Recommender(object):
     def predict(self, user_id, novelty_level=None):
         if novelty_level is None:
             novelty_level = self.novelty_level
-        response = parser.call(user_id)
-        user_music = pickle.loads(response)
+        user_music = parser.call(user_id)
 
         if user_music is None:
             return "Sorry, you closed access to your music collection."
