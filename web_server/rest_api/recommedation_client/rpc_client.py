@@ -18,7 +18,7 @@ class RpcClient(object):
 
     def on_response(self, ch, method, props, body):
         if self.corr_id == props.correlation_id:
-            self.response = body
+            self.response = pickle.loads(body)
 
     def call(self, n):
         self.response = None

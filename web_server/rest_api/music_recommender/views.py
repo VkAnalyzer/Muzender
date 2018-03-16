@@ -1,8 +1,10 @@
-from recommedation_client import recommedation_client as rc
+from recommedation_client.rpc_client import RpcClient
 from django.shortcuts import render
 
+
 def index_page(request, user_id='', predicted_song=''):
-    recommender = rc.RpcClient()
+    recommender = RpcClient(host='queue', routing_key='rpc_recommendations')
+
     if request.method == "POST":
         user_id = request.POST["text"]
         predicted_song = recommender.call({'user_id': user_id})
