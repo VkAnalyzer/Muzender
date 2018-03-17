@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'music_recommender',
-    'recommedation_client'
+    'recommedation_client',
+    'rest_framework'
 ]
 
 MIDDLEWARE = [
