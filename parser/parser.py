@@ -68,7 +68,7 @@ def on_request(ch, method, props, body):
 if __name__ == '__main__':
     parser = VkParser()
 
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host='queue'))
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host='queue', heartbeat=0))
     channel = connection.channel()
     channel.queue_declare(queue='rpc_user_music')
 
