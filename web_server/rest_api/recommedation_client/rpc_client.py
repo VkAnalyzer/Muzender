@@ -9,7 +9,7 @@ class RpcClient(object):
         self.response = None
         self.corr_id = None
 
-        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host=host, heartbeat=0))
+        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host=host))
         self.channel = self.connection.channel()
         result = self.channel.queue_declare(exclusive=True)
         self.callback_queue = result.method.queue

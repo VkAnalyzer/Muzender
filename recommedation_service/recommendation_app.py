@@ -70,7 +70,7 @@ class Recommender(object):
 if __name__ == '__main__':
     model = Recommender()
 
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host='queue', heartbeat=0))
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host='queue'))
     channel = connection.channel()
     channel.queue_declare(queue='rpc_recommendations')
 
