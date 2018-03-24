@@ -1,3 +1,4 @@
+import logging
 import collections
 import pickle
 import pika
@@ -17,8 +18,9 @@ class VkParser(object):
         session = vk_api.VkApi(login, password)
         try:
             session.auth()
+            logger.info('authorized in VK')
         except vk_api.AuthError as error_msg:
-            print(error_msg)
+            logger.critical('unathorized in vk with error: {}'.format(error_msg))
         return session
 
     def get_user_id(self, link):
@@ -45,6 +47,7 @@ class VkParser(object):
                 break
 
         all_audios = sum(all_audios, [])
+        logger.info('got {} audios'.format(len(all_audios)))
         return all_audios
 
 
@@ -66,6 +69,10 @@ def on_request(ch, method, props, body):
 
 
 if __name__ == '__main__':
+    logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                        level=logging.INFO)
+    logger = logging.getLogger('parser')
+    logger.info('Initialize parser')
     parser = VkParser()
 
     connection = pika.BlockingConnection(pika.ConnectionParameters(host='queue'))
@@ -75,5 +82,5 @@ if __name__ == '__main__':
     channel.basic_qos(prefetch_count=1)
     channel.basic_consume(on_request, queue='rpc_user_music')
 
-    print("parsing service ready")
+    logger.info('parsing service ready')
     channel.start_consuming()

@@ -1,4 +1,5 @@
 # coding: utf-8
+import logging
 from telegram.ext import Updater
 from telegram.ext import MessageHandler, Filters, CommandHandler
 from telegram import bot
@@ -14,13 +15,10 @@ DEFAULT_NOVELTY_LEVEL = 8
 
 def start(bot, update):
     message = """Hi there, if you show me your vk.com profile, I will recommend you some cool music. Just drop the link."""
-    bot.sendMessage(chat_id=update.message.chat_id,
-                    text=message,
-                    )
+    bot.sendMessage(chat_id=update.message.chat_id, text=message)
 
 
 def give_recommendation(bot, update):
-    # TODO don't drop connection
     recommender = RpcClient(host='queue', routing_key='rpc_recommendations')
     bot.sendMessage(chat_id=update.message.chat_id,
                     text='I need a minute to think about it')
@@ -64,6 +62,7 @@ def echo(bot, update):
 
     if 'vk.com/' in sent:
         vk_id = sent.split('/')[-1]
+        logger.info('new user: {}'.format(vk_id))
         user_preferences[update.message.chat_id] = {'user_id': vk_id,
                                                     'novelty_level': DEFAULT_NOVELTY_LEVEL}
         give_recommendation(bot, update)
@@ -79,18 +78,22 @@ def echo(bot, update):
                                                                             MAX_NOVELTY_LEVEL)
             give_recommendation(bot, update)
         elif sent == 'i like it!':
+            logger.info('user likes recommendation, details: {}'.format(user_preferences[update.message.chat_id]))
             bot.sendMessage(chat_id=update.message.chat_id, text='Thanks!')
         else:
             message = """Please, show me your vk.com profile, I will recommend you some cool music. Just drop the link."""
             bot.sendMessage(chat_id=update.message.chat_id, text=message)
-            # TODO: log nice feedback
     else:
         message = """Please, show me your vk.com profile, I will recommend you some cool music. Just drop the link."""
         bot.sendMessage(chat_id=update.message.chat_id, text=message)
-        # TODO: log nice feedback
 
 
 if __name__ == '__main__':
+    logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                        level=logging.INFO)
+    logger = logging.getLogger('tg bot')
+    logger.info('Initialize tg bot')
+
     with open('token.pkl', 'rb') as f:
         token = pickle.load(f)
 
