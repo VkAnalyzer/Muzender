@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'music_recommender',
     'recommedation_client',
-    'rest_framework'
+    #'rest_framework'
 ]
 
 MIDDLEWARE = [
