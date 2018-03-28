@@ -3,8 +3,6 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
-import Spinner from 'vue-spinner-component/src/Spinner.vue'
-Vue.component('spinner', Spinner)
 
 Vue.config.productionTip = false
 
@@ -14,8 +12,4 @@ new Vue({
   router,
   components: { App },
   template: '<App/>'
-})
-
-new Vue({
-  el: '#spinning'
 })
