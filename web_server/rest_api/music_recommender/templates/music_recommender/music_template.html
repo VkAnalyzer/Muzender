@@ -1,5 +1,9 @@
 <!doctype html>
+{% load render_bundle from webpack_loader %}
 <title>Muzender</title>
+<div id="app2">
+  [[ message ]]
+</div>
 <form method=post>
     {% csrf_token %}
     <dl>
@@ -11,3 +15,9 @@
 
 <br>We recommend you to listen the following song:<br>
 {{ predicted_song }}
+
+{% if not DEBUG %}
+  {% render_bundle 'manifest' 'js' %}
+  {% render_bundle 'vendor' 'js' %}
+{% endif %}
+{% render_bundle 'app' %}
