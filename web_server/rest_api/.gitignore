@@ -7,6 +7,9 @@ yarn-error.log*
 /test/unit/coverage/
 /test/e2e/reports/
 selenium-debug.log
+webpack-stats.json
+public/
+dist/
 
 # Editor directories and files
 .idea
