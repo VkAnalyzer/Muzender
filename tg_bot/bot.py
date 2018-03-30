@@ -28,9 +28,6 @@ def give_recommendation(bot, update):
         bot.sendMessage(chat_id=update.message.chat_id,
                         text=answer)
     else:
-        bot.sendMessage(chat_id=update.message.chat_id,
-                        text='Check this out:')
-
         if type(answer) is list:
             keyboard = []
             for artist in answer:
