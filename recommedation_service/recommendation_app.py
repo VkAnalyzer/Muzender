@@ -89,14 +89,14 @@ if __name__ == '__main__':
     logger.info('Initialize model')
     model = Recommender()
 
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host='queue'))
     channel = connection.channel()
     channel.queue_declare(queue='rpc_recommendations')
 
     channel.basic_qos(prefetch_count=1)
     channel.basic_consume(on_request, queue='rpc_recommendations')
 
-    model.parser = RpcClient(host='localhost', routing_key='rpc_user_music')
+    model.parser = RpcClient(host='queue', routing_key='rpc_user_music')
 
     logger.info('recommendation service ready')
     channel.start_consuming()
