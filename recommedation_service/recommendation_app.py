@@ -32,13 +32,18 @@ class Recommender(object):
 
         self.n_recommendations = n_recommendations
         self.novelty_level = novelty_level
+        self.parser = None
 
     def predict(self, user_id, novelty_level=None):
         logger.info('New recommendation request  for user: {}, novelty level: {}'.format(user_id,
                                                                                          novelty_level))
         if novelty_level is None:
             novelty_level = self.novelty_level
-        user_music = parser.call(user_id)
+        try:
+            user_music = self.parser.call(user_id)
+        except:
+            self.parser = RpcClient(host='localhost', routing_key='rpc_user_music')
+            user_music = self.parser.call(user_id)
 
         if user_music is None:
             logger.info('User {} closed access to music'.format(user_id))
@@ -84,14 +89,14 @@ if __name__ == '__main__':
     logger.info('Initialize model')
     model = Recommender()
 
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host='queue'))
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
     channel = connection.channel()
     channel.queue_declare(queue='rpc_recommendations')
 
     channel.basic_qos(prefetch_count=1)
     channel.basic_consume(on_request, queue='rpc_recommendations')
 
-    parser = RpcClient(host='queue', routing_key='rpc_user_music')
+    model.parser = RpcClient(host='localhost', routing_key='rpc_user_music')
 
     logger.info('recommendation service ready')
     channel.start_consuming()
