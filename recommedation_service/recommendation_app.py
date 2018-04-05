@@ -42,7 +42,7 @@ class Recommender(object):
         try:
             user_music = self.parser.call(user_id)
         except:
-            self.parser = RpcClient(host='localhost', routing_key='rpc_user_music')
+            self.parser = RpcClient(host='queue', routing_key='rpc_user_music')
             user_music = self.parser.call(user_id)
 
         if user_music is None:
