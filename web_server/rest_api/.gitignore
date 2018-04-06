@@ -18,3 +18,4 @@ dist/
 *.ntvs*
 *.njsproj
 *.sln
+music_recommender/test.json

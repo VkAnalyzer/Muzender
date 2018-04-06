@@ -6,7 +6,7 @@ from .serializers import VkProfileSerializer, BandSerializer, SongSerializer
 
 
 def index_page(request, user_id='', predicted_song=''):
-    recommender = RpcClient(host='queue', routing_key='rpc_recommendations')
+    #recommender = RpcClient(host='queue', routing_key='rpc_recommendations')
 
     if request.method == "POST":
         user_id = request.POST["text"]
@@ -22,6 +22,7 @@ class VkProfileViewSet(viewsets.ModelViewSet):
 
   def perform_create(self, serializer):
     user_id = self.request.data['vk_id']
-    if VkProfile.objects.filter(vk_id=user_id).exists():
-      self.destroy(self.request)
+    inst = VkProfile.objects.filter(vk_id=user_id)
+    if inst.exists():
+      inst.delete()
     serializer.save()

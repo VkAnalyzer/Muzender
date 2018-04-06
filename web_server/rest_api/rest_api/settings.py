@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'webpack_loader',
     'music_recommender',
     'recommedation_client',
-    #'rest_framework'
+    'rest_framework'
 ]
 
 MIDDLEWARE = [
