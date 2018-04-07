@@ -19,14 +19,17 @@ new Vue({
   el: '#app2',
   data: {
     rec_bands: '',
-    user_id: ''
+    user_id: '',
+    loading: false
   },
   delimiters: ['[[', ']]'],
   methods: {
     get_rec_bands: function () {
       var user = {user_id: this.user_id}
+      this.loading = true
       axios.post('http://localhost:8000/get_rec_bands/', user).then(response => {
         this.rec_bands = response.data
+        this.loading = false
       })
     }
 

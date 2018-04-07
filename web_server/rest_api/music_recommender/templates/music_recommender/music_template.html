@@ -5,8 +5,10 @@
 <div id="app2">
   <input v-model="user_id">
   <button v-on:click="get_rec_bands()">Get recommendation</button>
+  <p v-if="loading">Collecting your music preferences...this may take up to a few minutes</p>
   <p>We recommend you to listen the following bands: [[rec_bands]]</p>
 </div>
+
 <!--
 <form method=post>
     {% csrf_token %}
@@ -19,7 +21,6 @@
 <br>We recommend you to listen the following song:<br>
 {{ predicted_song }}
 -->
-
 
 {% if not DEBUG %}
   {% render_bundle 'manifest' 'js' %}
