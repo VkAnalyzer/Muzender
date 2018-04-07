@@ -20,12 +20,12 @@ def index_page(request):
 def get_recommendation(request):
 
   if request.method == 'POST':
-#    recommender = RpcClient(host='queue', routing_key='rpc_recommendations')
-#    if request.method == "POST":
-#      user_id = request.POST["text"]
-#      predicted_song = recommender.call({'user_id': user_id})
-    data = JSONParser().parse(request)
-    return JsonResponse(data, safe=False)
+    recommender = RpcClient(host='queue', routing_key='rpc_recommendations')
+    request_data = JSONParser().parse(request)
+    user_id = request_data["user_id"]
+    predicted_bands = recommender.call({'user_id': user_id})
+
+    return JsonResponse(predicted_bands, safe=False)
 
 
 class VkProfileViewSet(viewsets.ModelViewSet):
