@@ -1,9 +1,13 @@
 <!doctype html>
 {% load render_bundle from webpack_loader %}
 <title>Muzender</title>
+{% csrf_token %}
 <div id="app2">
-  [[ message ]]
+  <input v-model="user_id">
+  <button v-on:click="get_rec_bands()">Get recommendation</button>
+  <p>We recommend you to listen the following bands: [[rec_bands]]</p>
 </div>
+<!--
 <form method=post>
     {% csrf_token %}
     <dl>
@@ -12,9 +16,10 @@
         <dd><input type=submit value="Get music recommendation!">
     </dl>
 </form>
-
 <br>We recommend you to listen the following song:<br>
 {{ predicted_song }}
+-->
+
 
 {% if not DEBUG %}
   {% render_bundle 'manifest' 'js' %}

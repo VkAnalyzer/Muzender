@@ -3,6 +3,7 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
+import axios from 'axios'
 
 Vue.config.productionTip = false
 
@@ -17,7 +18,17 @@ new Vue({
 new Vue({
   el: '#app2',
   data: {
-    message: 'Это джаваскрипт!'
+    rec_bands: '',
+    user_id: ''
   },
-  delimiters: ['[[', ']]']
+  delimiters: ['[[', ']]'],
+  methods: {
+    get_rec_bands: function () {
+      var user = {user_id: this.user_id}
+      axios.post('http://localhost:8000/get_rec_bands/', user).then(response => {
+        this.rec_bands = response.data
+      })
+    }
+
+  }
 })

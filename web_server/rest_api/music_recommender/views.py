@@ -1,6 +1,12 @@
 from recommedation_client.rpc_client import RpcClient
 from django.shortcuts import render
+from django.http import HttpResponse, JsonResponse
 from rest_framework import viewsets
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework.renderers import JSONRenderer
+from rest_framework.parsers import JSONParser
 from .models import VkProfile, Band, Song
 from .serializers import VkProfileSerializer, BandSerializer, SongSerializer
 
@@ -14,6 +20,14 @@ def index_page(request, user_id='', predicted_song=''):
 
     return render(request, 'music_recommender/music_template.html', {'predicted_song': predicted_song,
                                                                      'user_id': user_id})
+
+
+@api_view(['GET', 'POST'])
+def get_recommendation(request):
+
+  if request.method == 'POST':
+    data = JSONParser().parse(request)
+    return JsonResponse(data, safe=False)
 
 
 class VkProfileViewSet(viewsets.ModelViewSet):

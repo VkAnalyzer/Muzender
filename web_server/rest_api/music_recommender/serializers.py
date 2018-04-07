@@ -34,3 +34,4 @@ class VkProfileSerializer(serializers.ModelSerializer):
         Song.objects.create(band=band, **song_data)
 
     return user
+
