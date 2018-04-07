@@ -11,21 +11,19 @@ from .models import VkProfile, Band, Song
 from .serializers import VkProfileSerializer, BandSerializer, SongSerializer
 
 
-def index_page(request, user_id='', predicted_song=''):
-    #recommender = RpcClient(host='queue', routing_key='rpc_recommendations')
+def index_page(request):
 
-    if request.method == "POST":
-        user_id = request.POST["text"]
-        predicted_song = recommender.call({'user_id': user_id})
-
-    return render(request, 'music_recommender/music_template.html', {'predicted_song': predicted_song,
-                                                                     'user_id': user_id})
+    return render(request, 'music_recommender/music_template.html')
 
 
 @api_view(['GET', 'POST'])
 def get_recommendation(request):
 
   if request.method == 'POST':
+#    recommender = RpcClient(host='queue', routing_key='rpc_recommendations')
+#    if request.method == "POST":
+#      user_id = request.POST["text"]
+#      predicted_song = recommender.call({'user_id': user_id})
     data = JSONParser().parse(request)
     return JsonResponse(data, safe=False)
 

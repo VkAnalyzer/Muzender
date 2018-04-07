@@ -1,5 +1,5 @@
 from django.conf.urls import url, include
-from .views import VkProfileViewSet, index_page, get_recommendation
+from .views import VkProfileViewSet, get_recommendation, index_page
 from rest_framework import routers
 
 
