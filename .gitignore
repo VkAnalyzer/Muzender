@@ -3,7 +3,8 @@
 parser/secret.pkl
 parser/vk_config.v2.json
 **/secret.pkl
-**/*__pycache__*
+**/*
+__pycache__*
 *.ipynb_checkpoints/
 data/*
 scratchpad/*
