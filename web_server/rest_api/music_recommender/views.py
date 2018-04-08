@@ -26,6 +26,7 @@ def get_recommendation(request):
     user_id = request_data["user_id"]
     predicted_bands = recommender.call({'user_id': user_id})
 
+    #time.sleep(4)
     return JsonResponse(predicted_bands, safe=False)
 
 

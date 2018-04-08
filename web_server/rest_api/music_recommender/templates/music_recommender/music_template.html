@@ -1,36 +1,56 @@
 <!doctype html>
-{% load render_bundle from webpack_loader %}
-<head>
-  <!--Import Google Icon Font-->
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-  <!--Import materialize.css-->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
-  <!--Let browser know website is optimized for mobile-->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Muzender</title>
-</head>
+<html>
+  {% load render_bundle from webpack_loader %}
+  {% load staticfiles %}
+  {% csrf_token %}
+  <head>
+    <link rel="stylesheet" type="text/css" href="{% static 'music_recommender/style.css' %}" />
+    <!--Import Google Icon Font-->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!--Import materialize.css-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
+    <!--Let browser know website is optimized for mobile-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Muzender</title>
+  </head>
 
-<body>
-{% csrf_token %}
-<div id="app2">
-  <input v-model="user_id">
-  <button v-on:click="get_rec_bands()">Get recommendation</button>
-  <p v-if="loading">Collecting your music preferences...this may take up to a few minutes
-  <div class="progress" v-if="loading">
-    <div class="indeterminate"></div>
+  <body>
+  <div class="content">
+    <div class="container-class">
+      <div id="app2">
+        <div id="app2-buttons">
+          <input v-model="user_id" placeholder="Enter vk.com profile">
+          <button class="waves-effect waves-light btn-large" v-on:click="get_rec_bands()">
+            <span>Recommend me some cool music</span>
+          </button>
+        </div>
+        <div class="loading">
+          <div class="progress" v-if="loading">
+            <div class="indeterminate"></div>
+          </div>
+        </div>
+        <div class="recommended-bands">
+          <p v-show="rec_bands">We recommend you to listen the following bands:</p>
+          <ul id="app2">
+            <li v-for="band in rec_bands">
+               <a v-bind:href="'https://music.yandex.ru/search?text='+band.trim().replace(' ', '%20')+'&type=artists'"
+               target="_blank"> [[ band ]]</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
   </div>
-  </p>
-  <p>We recommend you to listen the following bands: [[rec_bands]]</p>
-</div>
 
+    <!--Import jQuery before materialize.js-->
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+  </body>
 
-  <!--Import jQuery before materialize.js-->
-  <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
-</body>
-
-{% if not DEBUG %}
-  {% render_bundle 'manifest' 'js' %}
-  {% render_bundle 'vendor' 'js' %}
-{% endif %}
-{% render_bundle 'app' %}
+  {% if not DEBUG %}
+    {% render_bundle 'manifest' 'js' %}
+    {% render_bundle 'vendor' 'js' %}
+  {% endif %}
+  {% render_bundle 'app' %}
+</html>
