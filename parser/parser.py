@@ -6,6 +6,10 @@ import bs4
 import vk_api
 from vk_api.audio import VkAudio
 
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                    level=logging.INFO)
+logger = logging.getLogger('parser')
+
 
 class VkParser(object):
     def __init__(self):
@@ -29,7 +33,10 @@ class VkParser(object):
         if link.replace('id', '').isdigit():
             user_id = link.replace('id', '')
         else:
-            user_id = self.vk.utils.resolveScreenName(screen_name=link)['object_id']
+            try:
+                user_id = self.vk.utils.resolveScreenName(screen_name=link)['object_id']
+            except TypeError:
+                return None
         return int(user_id)
 
     def get_users_audio(self, session, vk_page):
@@ -69,9 +76,6 @@ def on_request(ch, method, props, body):
 
 
 if __name__ == '__main__':
-    logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                        level=logging.INFO)
-    logger = logging.getLogger('parser')
     logger.info('Initialize parser')
     parser = VkParser()
 
