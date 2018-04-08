@@ -59,7 +59,7 @@ def on_request(ch, method, props, body):
         response = parser.get_users_audio(session=parser.vk_session, vk_page=user_id)
     except vk_api.AccessDenied:
         response = None
-    print("parsed page of user", user_id)
+    logger.info("parsed page of user", user_id)
 
     ch.basic_publish(exchange='',
                      routing_key=props.reply_to,
