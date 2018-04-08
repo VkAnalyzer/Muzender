@@ -7,6 +7,10 @@ import pandas as pd
 import numpy as np
 from rpc_client import RpcClient
 
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                    level=logging.INFO)
+logger = logging.getLogger('recommender')
+
 
 def on_request(ch, method, props, body):
     body = pickle.loads(body)
@@ -83,9 +87,6 @@ class Recommender(object):
 
 
 if __name__ == '__main__':
-    logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                        level=logging.INFO)
-    logger = logging.getLogger('recommender')
     logger.info('Initialize model')
     model = Recommender()
 
