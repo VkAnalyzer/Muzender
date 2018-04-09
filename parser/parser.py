@@ -58,7 +58,9 @@ def on_request(ch, method, props, body):
     try:
         response = parser.get_users_audio(session=parser.vk_session, vk_page=user_id)
     except vk_api.AccessDenied:
-        response = None
+        # TODO: RQM doesn't work with pickle.dumps(None)
+        # check later
+        response = 'Nothing'
     logger.info("parsed page of user", user_id)
 
     ch.basic_publish(exchange='',

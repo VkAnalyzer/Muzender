@@ -45,7 +45,7 @@ class Recommender(object):
             self.parser = RpcClient(host='queue', routing_key='rpc_user_music')
             user_music = self.parser.call(user_id)
 
-        if user_music is None:
+        if user_music == 'Nothing':
             logger.info('User {} closed access to music'.format(user_id))
             return "Sorry, you closed access to your music collection."
         if len(user_music) == 0:
