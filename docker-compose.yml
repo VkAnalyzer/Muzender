@@ -9,23 +9,23 @@ services:
       - queue
     restart: on-failure
 
-#  recommedation_service:
-#    build: ./recommedation_service
-#    command: python3 recommendation_app.py
-#    depends_on:
-#      - queue
-#    networks:
-#      - queue
-#    restart: on-failure
-#
-#  parser:
-#    build: ./parser
-#    command: python3 parser.py
-#    depends_on:
-#      - queue
-#    networks:
-#      - queue
-#    restart: on-failure
+  recommedation_service:
+    build: ./recommedation_service
+    command: python3 recommendation_app.py
+    depends_on:
+      - queue
+    networks:
+      - queue
+    restart: on-failure
+
+  parser:
+    build: ./parser
+    command: python3 parser.py
+    depends_on:
+      - queue
+    networks:
+      - queue
+    restart: on-failure
 
   web_server:
     build: ./web_server
