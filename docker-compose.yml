@@ -8,6 +8,8 @@ services:
     networks:
       - queue
     restart: on-failure
+    logging:
+      driver: syslog
 
   recommedation_service:
     build: ./recommedation_service
@@ -17,6 +19,8 @@ services:
     networks:
       - queue
     restart: on-failure
+    logging:
+      driver: syslog
 
   parser:
     build: ./parser
@@ -26,6 +30,8 @@ services:
     networks:
       - queue
     restart: on-failure
+    logging:
+      driver: syslog
 
   web_server:
     build: ./web_server
@@ -37,6 +43,8 @@ services:
     networks:
       - queue
     restart: on-failure
+    logging:
+      driver: syslog
 
   tg_bot:
     build: ./tg_bot
@@ -46,6 +54,8 @@ services:
     networks:
       - queue
     restart: on-failure
+    logging:
+      driver: syslog
 
 networks:
   queue:
