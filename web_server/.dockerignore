@@ -1,0 +1,6 @@
+web_server/frontend/dist/
+web_server/frontend/node_modules/
+web_server/public/
+web_server/webpack-stats.json
+web_server/webpack-stats-prod.json
+web_server/db.sqlite3
