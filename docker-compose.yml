@@ -29,7 +29,7 @@ services:
 
   web_server:
     build: ./web_server
-    command: python3 rest_api/manage.py runserver 0.0.0.0:8000
+    command: python3 web_server/manage.py runserver 0.0.0.0:8000
     ports:
       - "8000:8000"
     depends_on:

@@ -9,3 +9,7 @@ data/*
 scratchpad/*
 recommedation_service/data/*
 tg_bot/token.pkl
+web_server/web_server/public/
+web_server/web_server/webpack-stats.json
+web_server/web_server/webpack-stats-prod.json
+web_server/web_server/db.sqlite3
