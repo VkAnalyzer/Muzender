@@ -1,0 +1,18 @@
+<!doctype html>
+{% load render_bundle from webpack_loader %}
+
+<html  lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Muzender</title>
+    {% render_bundle 'app' 'css' %}
+  </head>
+  <body>
+    <div id=app>
+    </div>
+
+    {% render_bundle 'manifest' %}
+    {% render_bundle 'vendor' %}
+    {% render_bundle 'app' 'js' %}
+  </body>
+</html>
