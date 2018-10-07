@@ -5,6 +5,7 @@ import pika
 import bs4
 import vk_api
 from vk_api.audio import VkAudio
+import redisworks
 
 
 class VkParser(object):
@@ -33,6 +34,10 @@ class VkParser(object):
         return int(user_id)
 
     def get_users_audio(self, session, vk_page):
+        result = r[str(vk_page)]
+        if result:
+            return result
+
         vkaudio = VkAudio(session)
 
         all_audios = []
@@ -48,6 +53,9 @@ class VkParser(object):
 
         all_audios = sum(all_audios, [])
         logger.info('got {} audios'.format(len(all_audios)))
+
+        r[str(vk_page)] = all_audios
+
         return all_audios
 
 
@@ -83,6 +91,8 @@ if __name__ == '__main__':
 
     channel.basic_qos(prefetch_count=1)
     channel.basic_consume(on_request, queue='rpc_user_music')
+
+    r = redisworks.Root(host='redis')
 
     logger.info('parsing service ready')
     channel.start_consuming()

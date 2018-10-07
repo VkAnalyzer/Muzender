@@ -1,3 +1,4 @@
 vk_api==9.3
 pika==0.11.2
 beautifulsoup4==4.6.0
+redisworks==0.2.7

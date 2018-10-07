@@ -6,7 +6,17 @@ services:
       - "5672:5672"
       - "15672:15672"
     networks:
-      - queue
+      - queue_net
+    restart: on-failure
+#    logging:
+#      driver: syslog
+
+  redis:
+    image: redis:4.0.11
+    ports:
+      - "6379:6379"
+    networks:
+      - queue_net
     restart: on-failure
     logging:
       driver: syslog
@@ -17,7 +27,7 @@ services:
     depends_on:
       - queue
     networks:
-      - queue
+      - queue_net
     restart: on-failure
     logging:
       driver: syslog
@@ -27,8 +37,9 @@ services:
     command: python3 parser.py
     depends_on:
       - queue
+      - redis
     networks:
-      - queue
+      - queue_net
     restart: on-failure
     logging:
       driver: syslog
@@ -41,7 +52,7 @@ services:
     depends_on:
       - queue
     networks:
-      - queue
+      - queue_net
     restart: on-failure
     logging:
       driver: syslog
@@ -52,11 +63,11 @@ services:
     depends_on:
       - queue
     networks:
-      - queue
+      - queue_net
     restart: on-failure
     logging:
       driver: syslog
 
 networks:
-  queue:
+  queue_net:
     driver: bridge
