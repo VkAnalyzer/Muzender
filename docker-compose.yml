@@ -8,8 +8,8 @@ services:
     networks:
       - queue_net
     restart: on-failure
-#    logging:
-#      driver: syslog
+    logging:
+      driver: syslog
 
   redis:
     image: redis:4.0.11

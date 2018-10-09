@@ -36,22 +36,11 @@ class VkParser(object):
     def get_users_audio(self, session, vk_page):
         result = r[str(vk_page)]
         if result:
-            return result
+            logger.info('return from cache')
+            return list(result)     # without list() pickle.dumps doesn't work
 
         vkaudio = VkAudio(session)
-
-        all_audios = []
-        offset = 0
-
-        while True:
-            audios = vkaudio.get(owner_id=vk_page, offset=offset)
-            all_audios.append(audios)
-            offset += len(audios)
-
-            if not audios:
-                break
-
-        all_audios = sum(all_audios, [])
+        all_audios = vkaudio.get(owner_id=vk_page)
         logger.info('got {} audios'.format(len(all_audios)))
 
         r[str(vk_page)] = all_audios
@@ -69,7 +58,7 @@ def on_request(ch, method, props, body):
         # TODO: RQM doesn't work with pickle.dumps(None)
         # check later
         response = 'Nothing'
-    logger.info("parsed page of user", user_id)
+    logger.info(f'parsed page of user {user_id}')
 
     ch.basic_publish(exchange='',
                      routing_key=props.reply_to,
