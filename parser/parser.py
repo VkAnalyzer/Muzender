@@ -5,6 +5,7 @@ import pika
 import bs4
 import vk_api
 from vk_api.audio import VkAudio
+import redisworks
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
@@ -40,21 +41,17 @@ class VkParser(object):
         return int(user_id)
 
     def get_users_audio(self, session, vk_page):
+        result = r[str(vk_page)]
+        if result:
+            logger.info('return from cache')
+            return list(result)     # without list() pickle.dumps doesn't work
+
         vkaudio = VkAudio(session)
-
-        all_audios = []
-        offset = 0
-
-        while True:
-            audios = vkaudio.get(owner_id=vk_page, offset=offset)
-            all_audios.append(audios)
-            offset += len(audios)
-
-            if not audios:
-                break
-
-        all_audios = sum(all_audios, [])
+        all_audios = vkaudio.get(owner_id=vk_page)
         logger.info('got {} audios'.format(len(all_audios)))
+
+        r[str(vk_page)] = all_audios
+
         return all_audios
 
 
@@ -68,7 +65,7 @@ def on_request(ch, method, props, body):
         # TODO: RQM doesn't work with pickle.dumps(None)
         # check later
         response = 'Nothing'
-    logger.info("parsed page of user", user_id)
+    logger.info(f'parsed page of user {user_id}')
 
     ch.basic_publish(exchange='',
                      routing_key=props.reply_to,
@@ -87,6 +84,8 @@ if __name__ == '__main__':
 
     channel.basic_qos(prefetch_count=1)
     channel.basic_consume(on_request, queue='rpc_user_music')
+
+    r = redisworks.Root(host='redis')
 
     logger.info('parsing service ready')
     channel.start_consuming()
