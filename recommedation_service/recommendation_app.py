@@ -1,25 +1,22 @@
 import logging
-import pika
 import pickle
-from scipy import sparse
-import implicit
-import pandas as pd
-import numpy as np
-from rpc_client import RpcClient
 
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    level=logging.INFO)
-logger = logging.getLogger('recommender')
+import numpy as np
+import pandas as pd
+import pika
+from scipy import sparse
 
 
 def on_request(ch, method, props, body):
     body = pickle.loads(body)
-    response = model.predict(**body)
+    response = model.predict(body['user_id'], body['novelty_level'], body['user_music'])
+    body['recommendations'] = response
 
-    ch.basic_publish(exchange='',
-                     routing_key=props.reply_to,
-                     properties=pika.BasicProperties(correlation_id=props.correlation_id),
-                     body=pickle.dumps(response))
+    channel.basic_publish(exchange='',
+                          routing_key='tg_bot',
+                          body=pickle.dumps(body),
+                          properties=pika.BasicProperties(),
+                          )
     ch.basic_ack(delivery_tag=method.delivery_tag)
 
 
@@ -38,16 +35,11 @@ class Recommender(object):
         self.novelty_level = novelty_level
         self.parser = None
 
-    def predict(self, user_id, novelty_level=None):
+    def predict(self, user_id, novelty_level=None, user_music='Nothing'):
         logger.info('New recommendation request  for user: {}, novelty level: {}'.format(user_id,
                                                                                          novelty_level))
         if novelty_level is None:
             novelty_level = self.novelty_level
-        try:
-            user_music = self.parser.call(user_id)
-        except:
-            self.parser = RpcClient(host='queue', routing_key='rpc_user_music')
-            user_music = self.parser.call(user_id)
 
         if user_music == 'Nothing':
             logger.info('User {} closed access to music'.format(user_id))
@@ -87,17 +79,18 @@ class Recommender(object):
 
 
 if __name__ == '__main__':
+    logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
+    logger = logging.getLogger('recommender')
+
     logger.info('Initialize model')
     model = Recommender()
 
     connection = pika.BlockingConnection(pika.ConnectionParameters(host='queue'))
     channel = connection.channel()
-    channel.queue_declare(queue='rpc_recommendations')
+    channel.queue_declare(queue='reco_queue')
 
     channel.basic_qos(prefetch_count=1)
-    channel.basic_consume(on_request, queue='rpc_recommendations')
-
-    model.parser = RpcClient(host='queue', routing_key='rpc_user_music')
+    channel.basic_consume(on_request, queue='reco_queue')
 
     logger.info('recommendation service ready')
     channel.start_consuming()
