@@ -58,7 +58,7 @@ if __name__ == '__main__':
     logger = logging.getLogger('crawler')
 
     logger.info('Initialize crawler')
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host='queue'))
     channel = connection.channel()
     crawler = VkCrawler(level_count=50,
                         max_friends=200,
