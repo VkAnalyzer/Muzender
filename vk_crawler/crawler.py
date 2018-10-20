@@ -26,7 +26,7 @@ class VkCrawler():
         channel.basic_publish(exchange='',
                               routing_key='user_id',
                               properties=pika.BasicProperties(),
-                              body=pickle.dumps({'user_id': user_id}),
+                              body=pickle.dumps({'user_id': str(user_id)}),
                               )
 
         res = channel.queue_declare(queue='user_id', passive=True)
