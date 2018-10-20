@@ -62,14 +62,15 @@ def on_request(ch, method, props, body):
         logging.warning(f'access to {user_id} page denied')
     logger.info(f'parsed page of user {user_id}')
 
-    body['user_music'] = response
+    if 'chat_id' in body:
+        body['user_music'] = response
 
-    channel.basic_publish(exchange='',
-                          routing_key='reco_queue',
-                          properties=pika.BasicProperties(),
-                          body=pickle.dumps(body),
-                          )
-    logger.info(f'send results to queue')
+        channel.basic_publish(exchange='',
+                              routing_key='reco_queue',
+                              properties=pika.BasicProperties(),
+                              body=pickle.dumps(body),
+                              )
+        logger.info(f'send results to queue')
     ch.basic_ack(delivery_tag=method.delivery_tag)
 
 
