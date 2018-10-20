@@ -1,8 +1,9 @@
-import vk_api
-import pickle
-import pika
-import time
 import logging
+import pickle
+import time
+
+import pika
+import vk_api
 
 
 class VkCrawler():
