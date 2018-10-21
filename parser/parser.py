@@ -46,8 +46,8 @@ class VkParser(object):
         all_audios = vkaudio.get(owner_id=vk_page)
         logger.info('got {} audios'.format(len(all_audios)))
 
-        r[str(vk_page)] = all_audios
-
+        if all_audios:
+            r[str(vk_page)] = all_audios
         return all_audios
 
 
@@ -57,19 +57,20 @@ def on_request(ch, method, props, body):
 
     try:
         response = parser.get_users_audio(session=parser.vk_session, vk_page=user_id)
-    except vk_api.AccessDenied:
+    except (vk_api.AccessDenied, AttributeError, TypeError) as e:
         response = 'Nothing'
         logging.warning(f'access to {user_id} page denied')
     logger.info(f'parsed page of user {user_id}')
 
-    body['user_music'] = response
+    if 'chat_id' in body:
+        body['user_music'] = response
 
-    channel.basic_publish(exchange='',
-                          routing_key='reco_queue',
-                          properties=pika.BasicProperties(),
-                          body=pickle.dumps(body),
-                          )
-    logger.info(f'send results to queue')
+        channel.basic_publish(exchange='',
+                              routing_key='reco_queue',
+                              properties=pika.BasicProperties(),
+                              body=pickle.dumps(body),
+                              )
+        logger.info(f'send results to queue')
     ch.basic_ack(delivery_tag=method.delivery_tag)
 
 
