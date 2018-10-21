@@ -12,6 +12,7 @@ from telegram.ext import Updater
 MIN_NOVELTY_LEVEL = 1
 MAX_NOVELTY_LEVEL = 150
 DEFAULT_NOVELTY_LEVEL = 8
+TG_BOT_PRIORITY = 2  # message priority in queue higher is better
 
 
 def start(bot, update):
@@ -25,7 +26,7 @@ def request_recommendations(body):
     channel.basic_publish(exchange='',
                           routing_key='user_id',
                           body=pickle.dumps(body),
-                          properties=pika.BasicProperties(),
+                          properties=pika.BasicProperties(priority=TG_BOT_PRIORITY),
                           )
     logger.info(f'send recommendation request for user {body["user_id"]} with novelty_level {body["novelty_level"]}')
 
