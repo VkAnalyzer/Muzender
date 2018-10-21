@@ -14,7 +14,8 @@ class VkParser(object):
         self.vk_session = self.connect_vk(secret['login'], secret['password'])
         self.vk = self.vk_session.get_api()
 
-    def connect_vk(self, login, password):
+    @staticmethod
+    def connect_vk(login, password):
         session = vk_api.VkApi(login, password)
         try:
             session.auth()
@@ -84,7 +85,7 @@ if __name__ == '__main__':
 
     connection = pika.BlockingConnection(pika.ConnectionParameters(host='queue'))
     channel = connection.channel()
-    channel.queue_declare(queue='user_id')
+    channel.queue_declare(queue='user_id', arguments={'x-max-priority': 3})
 
     channel.basic_qos(prefetch_count=1)
     channel.basic_consume(on_request, queue='user_id')
