@@ -57,7 +57,7 @@ def on_request(ch, method, props, body):
 
     try:
         response = parser.get_users_audio(session=parser.vk_session, vk_page=user_id)
-    except (vk_api.AccessDenied, AttributeError) as e:
+    except (vk_api.AccessDenied, AttributeError, TypeError) as e:
         response = 'Nothing'
         logging.warning(f'access to {user_id} page denied')
     logger.info(f'parsed page of user {user_id}')
