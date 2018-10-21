@@ -1,5 +1,5 @@
 # coding: utf-8
-import time
+import os
 import logging
 import pickle
 from threading import Thread
@@ -107,7 +107,6 @@ def echo(bot, update):
 
 
 if __name__ == '__main__':
-    time.sleep(30)
     logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                         level=logging.INFO)
     logger = logging.getLogger('tg bot')
@@ -124,10 +123,14 @@ if __name__ == '__main__':
     dispatcher.add_handler(echo_handler)
     Thread(target=updater.start_polling())
 
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host='queue'))
-    channel = connection.channel()
-    channel.queue_declare(queue='tg_bot')
+    try:
+        connection = pika.BlockingConnection(pika.ConnectionParameters(host='queue'))
+        channel = connection.channel()
+        channel.queue_declare(queue='tg_bot')
 
-    channel.basic_qos(prefetch_count=1)
-    channel.basic_consume(on_request, queue='tg_bot')
-    channel.start_consuming()
+        channel.basic_qos(prefetch_count=1)
+        channel.basic_consume(on_request, queue='tg_bot')
+        channel.start_consuming()
+    except:
+        # close all threads if connection is lost
+        os._exit(1)

@@ -1,10 +1,8 @@
 import logging
 import pickle
 
-import numpy as np
 import pandas as pd
 import pika
-from scipy import sparse
 
 
 def on_request(ch, method, props, body):
@@ -22,13 +20,8 @@ def on_request(ch, method, props, body):
 
 class Recommender(object):
     def __init__(self, n_recommendations=5, novelty_level=9):
-        with open('data/dataset.pkl', 'rb') as f:
-            self.dataset_s = pickle.load(f)
 
-        with open('data/artist_names.pkl', 'rb') as f:
-            self.artist_names = pickle.load(f)
-
-        with open('data/model.pkl', 'rb') as f:
+        with open('data/model_w2v.pkl', 'rb') as f:
             self.model = pickle.load(f)
 
         self.n_recommendations = n_recommendations
@@ -36,46 +29,24 @@ class Recommender(object):
         self.parser = None
 
     def predict(self, user_id, novelty_level=None, user_music='Nothing'):
-        logger.info('New recommendation request  for user: {}, novelty level: {}'.format(user_id,
-                                                                                         novelty_level))
+        logger.info(f'New recommendation request  for user: {user_id}, novelty level: {novelty_level}')
         if novelty_level is None:
             novelty_level = self.novelty_level
 
         if user_music == 'Nothing':
-            logger.info('User {} closed access to music'.format(user_id))
-            return "Sorry, you closed access to your music collection."
+            logger.info(f'User {user_id} closed access to music')
+            return 'Sorry, you closed access to your music collection.'
         if len(user_music) == 0:
             logger.warning('Wrong user id or no music in collection.')
-            return "No such user or empty music collection."
+            return 'No such user or empty music collection.'
 
         artists = list(pd.DataFrame(user_music)['artist'])
-        logger.info('Got {} artists from parser.'.format(len(artists)))
-        user_items = np.zeros(len(self.artist_names))
-        user_items[self.artist_names.isin(artists)] = 1
-        logger.info('{} known artists.'.format(np.sum(user_items)))
+        logger.info(f'Got {len(artists)} artists from parser.')
 
-        last_id = self.dataset_s.shape[0]  # last id+1
-        recommendations = np.array(self.model.recommend(last_id,
-                                                        sparse.vstack((self.dataset_s,
-                                                                       sparse.csr_matrix(user_items))),
-                                                        recalculate_user=True,
-                                                        N=80
-                                                        ))
-        user_count = self.dataset_s.shape[0]
-        popularity = []
-        artists = recommendations[:, 0].astype(int)
-        temp_dataset = self.dataset_s.tocsc()
-        for artist in artists:
-            popularity.append(temp_dataset[:, artist].count_nonzero() / user_count)
-
-        artist_rating = (recommendations[:, 1]
-                         * (1 - np.array(popularity) * novelty_level * 6))
-        recommendation_indexes = artist_rating.argsort()[-self.n_recommendations:][::-1]
-
-        recommendation = list(self.artist_names[recommendations[recommendation_indexes, 0]
-                              .astype('int')])
-        logger.info('Recommendation: {}'.format(recommendation))
-        return recommendation
+        recommendations = self.model.predict_output_word(artists)
+        recommendations = [artist for artist, score in recommendations][:self.n_recommendations]
+        logger.info(f'Recommendation: {recommendations}')
+        return recommendations
 
 
 if __name__ == '__main__':
