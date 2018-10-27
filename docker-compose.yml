@@ -12,7 +12,7 @@ services:
       driver: syslog
 
   redis:
-    image: redis:4.0.11
+    image: redis:5.0.0
     ports:
       - "6379:6379"
     networks:

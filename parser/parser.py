@@ -1,6 +1,7 @@
 import logging
 import pickle
 
+import pandas as pd
 import pika
 import redisworks
 import vk_api
@@ -44,13 +45,15 @@ class VkParser(object):
         result = r[str(vk_page)]
         if result:
             logger.info('return from cache')
-            return list(result)     # without list() pickle.dumps doesn't work
+            return dict(result)     # until conversion to dict it's redis dot ibject
 
         vkaudio = VkAudio(session)
         all_audios = vkaudio.get(owner_id=vk_page)
         logger.info('got {} audios'.format(len(all_audios)))
 
         if all_audios:
+            all_audios = pd.DataFrame(all_audios)
+            all_audios = all_audios[['title', 'artist']].to_dict()
             r[str(vk_page)] = all_audios
             self.parsed_users.append(str(vk_page))
             if len(self.parsed_users) > USER_BATCH_SIZE:
