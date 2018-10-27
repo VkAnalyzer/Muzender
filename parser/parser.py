@@ -7,12 +7,16 @@ import vk_api
 from vk_api.audio import VkAudio
 
 
+USER_BATCH_SIZE = 100
+
+
 class VkParser(object):
     def __init__(self):
         with open('secret.pkl', mode='rb') as f:
             secret = pickle.load(f)
         self.vk_session = self.connect_vk(secret['login'], secret['password'])
         self.vk = self.vk_session.get_api()
+        self.parsed_users = []
 
     @staticmethod
     def connect_vk(login, password):
@@ -36,8 +40,7 @@ class VkParser(object):
                 return None
         return int(user_id)
 
-    @staticmethod
-    def get_users_audio(session, vk_page):
+    def get_users_audio(self, session, vk_page):
         result = r[str(vk_page)]
         if result:
             logger.info('return from cache')
@@ -49,6 +52,10 @@ class VkParser(object):
 
         if all_audios:
             r[str(vk_page)] = all_audios
+            self.parsed_users.append(str(vk_page))
+            if len(self.parsed_users) > USER_BATCH_SIZE:
+                r['parsed_users'] = list(r['parsed_users']) + self.parsed_users  # not safe but not critical also
+                self.parsed_users = []
         return all_audios
 
 
@@ -91,6 +98,9 @@ if __name__ == '__main__':
     channel.basic_consume(on_request, queue='user_id')
 
     r = redisworks.Root(host='redis')
+    if not r['parsed_users']:
+        r['parsed_users'] = ['dummy']
+        logging.info('parsed users list initialized in Redis')
 
     logger.info('parsing service ready')
     channel.start_consuming()
