@@ -4,3 +4,4 @@ pandas==0.21.0
 pika==0.11.2
 beautifulsoup4==4.6.0
 redisworks==0.2.7
+sentry_sdk==0.5.1

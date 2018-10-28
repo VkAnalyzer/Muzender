@@ -4,11 +4,23 @@ import pickle
 import pandas as pd
 import pika
 import redisworks
+import sentry_sdk
 import vk_api
+from sentry_sdk.integrations.logging import LoggingIntegration
 from vk_api.audio import VkAudio
 
 
 USER_BATCH_SIZE = 100
+
+sentry_logging = LoggingIntegration(
+    level=logging.INFO,        # Capture info and above as breadcrumbs
+    event_level=logging.ERROR  # Send errors as events
+)
+
+sentry_sdk.init(
+    dsn="https://cebc4845ef8145f1a07c77a840f64374@sentry.io/1310687",
+    integrations=[sentry_logging]
+)
 
 
 class VkParser(object):

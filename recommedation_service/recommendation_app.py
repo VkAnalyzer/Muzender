@@ -3,6 +3,19 @@ import pickle
 
 import pandas as pd
 import pika
+import sentry_sdk
+from sentry_sdk.integrations.logging import LoggingIntegration
+
+
+sentry_logging = LoggingIntegration(
+    level=logging.INFO,        # Capture info and above as breadcrumbs
+    event_level=logging.ERROR  # Send errors as events
+)
+
+sentry_sdk.init(
+    dsn="https://cebc4845ef8145f1a07c77a840f64374@sentry.io/1310687",
+    integrations=[sentry_logging]
+)
 
 
 def on_request(ch, method, props, body):
