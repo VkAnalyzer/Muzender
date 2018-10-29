@@ -3,7 +3,7 @@ import pickle
 
 import pandas as pd
 import pika
-import redisworks
+import redis
 import sentry_sdk
 import vk_api
 from sentry_sdk.integrations.logging import LoggingIntegration
@@ -11,6 +11,8 @@ from vk_api.audio import VkAudio
 
 
 USER_BATCH_SIZE = 100
+CACHE_LIFETIME = 60 * 60 * 24 * 3  # 3 days in seconds
+DATASET_PATH = '../data/vk_dataset.csv'
 
 sentry_logging = LoggingIntegration(
     level=logging.INFO,        # Capture info and above as breadcrumbs
@@ -54,7 +56,7 @@ class VkParser(object):
         return int(user_id)
 
     def get_users_audio(self, session, vk_page):
-        result = r[str(vk_page)]
+        result = cache.get(str(vk_page))
         if result:
             logger.info('return from cache')
             return dict(result)     # until conversion to dict it's redis dot ibject
@@ -65,12 +67,11 @@ class VkParser(object):
 
         if all_audios:
             all_audios = pd.DataFrame(all_audios)
+            all_audios['user_id'] = vk_page
+            all_audios[['user_id', 'title', 'artist']].to_csv(DATASET_PATH, mode='a', index=None, header=None)
+
             all_audios = all_audios[['title', 'artist']].to_dict()
-            r[str(vk_page)] = all_audios
-            self.parsed_users.append(str(vk_page))
-            if len(self.parsed_users) > USER_BATCH_SIZE:
-                r['parsed_users'] = list(r['parsed_users']) + self.parsed_users  # not safe but not critical also
-                self.parsed_users = []
+            cache.setex(str(vk_page), all_audios, CACHE_LIFETIME)
         return all_audios
 
 
@@ -112,10 +113,7 @@ if __name__ == '__main__':
     channel.basic_qos(prefetch_count=1)
     channel.basic_consume(on_request, queue='user_id')
 
-    r = redisworks.Root(host='redis')
-    if not r['parsed_users']:
-        r['parsed_users'] = ['dummy']
-        logging.info('parsed users list initialized in Redis')
+    cache = redis.Redis(host='redis')
 
     logger.info('parsing service ready')
     channel.start_consuming()
