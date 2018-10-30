@@ -3,7 +3,20 @@ import pickle
 import time
 
 import pika
+import sentry_sdk
 import vk_api
+from sentry_sdk.integrations.logging import LoggingIntegration
+
+
+sentry_logging = LoggingIntegration(
+    level=logging.INFO,        # Capture info and above as breadcrumbs
+    event_level=logging.ERROR  # Send errors as events
+)
+
+sentry_sdk.init(
+    dsn="https://cebc4845ef8145f1a07c77a840f64374@sentry.io/1310687",
+    integrations=[sentry_logging]
+)
 
 
 class VkCrawler():
@@ -21,25 +34,25 @@ class VkCrawler():
         self.parsed_users = []
 
     def recursive_get_friends(self, user_id, curr_level):
-        self.parsed_users.append(user_id)
-
-        channel.basic_publish(exchange='',
-                              routing_key='user_id',
-                              properties=pika.BasicProperties(),
-                              body=pickle.dumps({'user_id': str(user_id)}),
-                              )
-
-        res = channel.queue_declare(queue='user_id', passive=True)
-        queue_length = res.method.message_count
-        while queue_length >= self.max_queue_len:
-            time.sleep(20)
-            res = channel.queue_declare(queue='user_id', passive=True)
-            queue_length = res.method.message_count
-
         if curr_level:
             try:
                 result = self.vk.users.getFollowers(user_id=user_id)['items'][:self.max_friends]
                 result = [user for user in result if user not in self.parsed_users]
+                for user in result:
+                    channel.basic_publish(exchange='',
+                                          routing_key='user_id',
+                                          properties=pika.BasicProperties(),
+                                          body=pickle.dumps({'user_id': str(user)}),
+                                          )
+                    self.parsed_users.append(user_id)
+
+                    res = channel.queue_declare(queue='user_id', passive=True)
+                    queue_length = res.method.message_count
+                    while queue_length >= self.max_queue_len:
+                        time.sleep(20)
+                        res = channel.queue_declare(queue='user_id', passive=True)
+                        queue_length = res.method.message_count
+
                 for user in result:
                     self.recursive_get_friends(user, curr_level - 1)
 
@@ -66,4 +79,4 @@ if __name__ == '__main__':
                         )
     logger.info('crawling service ready')
 
-    crawler.start(288273)
+    crawler.start(175381)

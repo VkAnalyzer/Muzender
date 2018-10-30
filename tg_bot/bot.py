@@ -1,13 +1,25 @@
-# coding: utf-8
-import os
 import logging
+import os
 import pickle
 from threading import Thread
 
 import pika
+import sentry_sdk
 import telegram
+from sentry_sdk.integrations.logging import LoggingIntegration
 from telegram.ext import MessageHandler, Filters, CommandHandler
 from telegram.ext import Updater
+
+
+sentry_logging = LoggingIntegration(
+    level=logging.INFO,        # Capture info and above as breadcrumbs
+    event_level=logging.ERROR  # Send errors as events
+)
+
+sentry_sdk.init(
+    dsn="https://cebc4845ef8145f1a07c77a840f64374@sentry.io/1310687",
+    integrations=[sentry_logging]
+)
 
 MIN_NOVELTY_LEVEL = 1
 MAX_NOVELTY_LEVEL = 150

@@ -2,3 +2,4 @@ python-telegram-bot==9.0.0
 pandas==0.21.0
 pika==0.11.2
 gensim==3.6.0
+sentry_sdk==0.5.1
