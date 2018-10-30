@@ -59,7 +59,7 @@ class VkParser(object):
         result = cache.get(str(vk_page))
         if result:
             logger.info('return from cache')
-            return dict(result)     # until conversion to dict it's redis dot ibject
+            return pickle.loads(result)
 
         vkaudio = VkAudio(session)
         all_audios = vkaudio.get(owner_id=vk_page)
@@ -71,7 +71,7 @@ class VkParser(object):
             all_audios[['user_id', 'title', 'artist']].to_csv(DATASET_PATH, mode='a', index=None, header=None)
 
             all_audios = all_audios[['title', 'artist']].to_dict()
-            cache.setex(str(vk_page), all_audios, CACHE_LIFETIME)
+            cache.setex(str(vk_page), pickle._dumps(all_audios), CACHE_LIFETIME)
         return all_audios
 
 
