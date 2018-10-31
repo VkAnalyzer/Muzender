@@ -16,8 +16,8 @@ class RpcClient:
 
         result = self.channel.queue_declare(exclusive=True)
         self.callback_queue = result.method.queue
-        self.channel.basic_consume(self.on_response, no_ack=True,
-                                   queue=self.callback_queue)
+        self.consumer_tag = self.channel.basic_consume(self.on_response, no_ack=True,
+                                                       queue=self.callback_queue)
 
     def on_response(self, ch, method, props, body):
         if self.corr_id == props.correlation_id:
@@ -35,5 +35,6 @@ class RpcClient:
                                    body=pickle.dumps(body))
         while self.response is None:
             self.connection.process_data_events()
+        self.channel.basic_cancel(self.consumer_tag)
         self.channel.queue_delete(queue=self.callback_queue)
         return self.response
