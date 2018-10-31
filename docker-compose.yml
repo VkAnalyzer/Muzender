@@ -29,6 +29,8 @@ services:
     networks:
       - queue_net
     restart: on-failure
+    volumes:
+    - ./data:/data
     logging:
       driver: syslog
 
@@ -41,6 +43,8 @@ services:
     networks:
       - queue_net
     restart: on-failure
+    volumes:
+    - ./data:/data
     logging:
       driver: syslog
 

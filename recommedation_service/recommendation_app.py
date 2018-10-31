@@ -34,7 +34,7 @@ def on_request(ch, method, props, body):
 class Recommender(object):
     def __init__(self, n_recommendations=5, novelty_level=9):
 
-        with open('data/model_w2v.pkl', 'rb') as f:
+        with open('../data/model_w2v.pkl', 'rb') as f:
             self.model = pickle.load(f)
 
         self.n_recommendations = n_recommendations
