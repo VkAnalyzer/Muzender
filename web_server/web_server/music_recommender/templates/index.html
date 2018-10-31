@@ -1,5 +1,7 @@
 <!doctype html>
 {% load render_bundle from webpack_loader %}
+{% load staticfiles %}
+{% csrf_token %}
 
 <html  lang="en">
   <head>
@@ -8,9 +10,7 @@
     {% render_bundle 'app' 'css' %}
   </head>
   <body>
-    <div id=app>
-    </div>
-
+    <div id=app></div>
     {% render_bundle 'manifest' %}
     {% render_bundle 'vendor' %}
     {% render_bundle 'app' 'js' %}
