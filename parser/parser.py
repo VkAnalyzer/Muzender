@@ -1,4 +1,5 @@
 import logging
+import os
 import pickle
 
 import pandas as pd
@@ -20,7 +21,7 @@ sentry_logging = LoggingIntegration(
 )
 
 sentry_sdk.init(
-    dsn="https://cebc4845ef8145f1a07c77a840f64374@sentry.io/1310687",
+    dsn=os.environ.get('SENTRY_DSN'),
     integrations=[sentry_logging]
 )
 
