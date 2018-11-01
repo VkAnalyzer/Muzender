@@ -7,8 +7,6 @@ import pika
 import sentry_sdk
 from sentry_sdk.integrations.logging import LoggingIntegration
 
-WEB_NOVELTY_LVL = 9
-
 sentry_logging = LoggingIntegration(
     level=logging.INFO,  # Capture info and above as breadcrumbs
     event_level=logging.ERROR  # Send errors as events
