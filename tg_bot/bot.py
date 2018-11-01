@@ -10,9 +10,8 @@ from sentry_sdk.integrations.logging import LoggingIntegration
 from telegram.ext import MessageHandler, Filters, CommandHandler
 from telegram.ext import Updater
 
-
 sentry_logging = LoggingIntegration(
-    level=logging.INFO,        # Capture info and above as breadcrumbs
+    level=logging.INFO,  # Capture info and above as breadcrumbs
     event_level=logging.ERROR  # Send errors as events
 )
 

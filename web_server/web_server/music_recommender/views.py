@@ -1,4 +1,4 @@
-from recommendation_service.rpc_client import RpcClient
+from recommendation_client.rpc_client import RpcClient
 from rest_framework.parsers import JSONParser
 from django.http import JsonResponse
 from rest_framework.decorators import api_view
@@ -10,9 +10,11 @@ import random
 def get_recommendation(request):
     if request.method == 'POST':
         request_data = JSONParser().parse(request)
+        request_data['novelty_level'] = 9
 
         rpc_client = RpcClient(routing_key='user_id', host='queue')
-        predicted_bands = rpc_client.call(request_data)
+        response = rpc_client.call(request_data)
+        recommendations = response['recommendations']
         # time.sleep(5)
         # predicted_bands = ['545', '3434', str(random.randint(1, 100))]
-        return JsonResponse(['4'], safe=False)
+        return JsonResponse(recommendations, safe=False)

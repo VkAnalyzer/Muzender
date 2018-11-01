@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'music_recommender',
-    'recommendation_service',
+    'recommendation_client',
     'rest_framework',
     'corsheaders', # for django-vue requests support
     'webpack_loader' # for django-vue integration

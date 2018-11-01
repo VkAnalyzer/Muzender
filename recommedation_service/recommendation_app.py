@@ -7,6 +7,8 @@ import pika
 import sentry_sdk
 from sentry_sdk.integrations.logging import LoggingIntegration
 
+WEB_NOVELTY_LVL = 9
+
 sentry_logging = LoggingIntegration(
     level=logging.INFO,  # Capture info and above as breadcrumbs
     event_level=logging.ERROR  # Send errors as events
@@ -28,14 +30,16 @@ def on_request(ch, method, props, body):
                               routing_key=props.reply_to,
                               body=pickle.dumps(body),
                               properties=pika.BasicProperties(
-                                  props.correlation_id),
+                                  correlation_id=props.correlation_id),
                               )
+        logger.info(f'Predictions sent to web_server')
     else:
         channel.basic_publish(exchange='',
                               routing_key='tg_bot',
                               body=pickle.dumps(body),
                               properties=pika.BasicProperties(),
                               )
+        logger.info(f'Predictions sent to tg_bot')
     ch.basic_ack(delivery_tag=method.delivery_tag)
 
 

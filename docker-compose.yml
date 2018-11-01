@@ -81,16 +81,16 @@ services:
 #    logging:
 #      driver: syslog
 
-  tg_bot:
-    build: ./tg_bot
-    command: python3 bot.py
-    depends_on:
-      - queue
-    networks:
-      - queue_net
-    environment:
-      SENTRY_DSN: "${SENTRY_DSN:-}"
-    restart: on-failure
+#  tg_bot:
+#    build: ./tg_bot
+#    command: python3 bot.py
+#    depends_on:
+#      - queue
+#    networks:
+#      - queue_net
+#    environment:
+#      SENTRY_DSN: "${SENTRY_DSN:-}"
+#    restart: on-failure
 #    logging:
 #      driver: syslog
 
