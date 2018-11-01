@@ -1,5 +1,5 @@
+python-telegram-bot==9.0.0
 pandas==0.21.0
-implicit==0.2.7
 pika==0.11.2
-scipy==1.0.0
-numpy==1.13.3
+gensim==3.6.0
+sentry_sdk==0.5.1

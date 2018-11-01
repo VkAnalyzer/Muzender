@@ -1,15 +1,28 @@
 import logging
-import collections
+import os
 import pickle
-import pika
-import bs4
-import vk_api
-from vk_api.audio import VkAudio
-import redisworks
 
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    level=logging.INFO)
-logger = logging.getLogger('parser')
+import pandas as pd
+import pika
+import redis
+import sentry_sdk
+import vk_api
+from sentry_sdk.integrations.logging import LoggingIntegration
+from vk_api.audio import VkAudio
+
+USER_BATCH_SIZE = 100
+CACHE_LIFETIME = 60 * 60 * 24 * 3  # 3 days in seconds
+DATASET_PATH = '../data/vk_dataset.csv'
+
+sentry_logging = LoggingIntegration(
+    level=logging.INFO,  # Capture info and above as breadcrumbs
+    event_level=logging.ERROR  # Send errors as events
+)
+
+sentry_sdk.init(
+    dsn=os.environ.get('SENTRY_DSN'),
+    integrations=[sentry_logging]
+)
 
 
 class VkParser(object):
@@ -18,8 +31,10 @@ class VkParser(object):
             secret = pickle.load(f)
         self.vk_session = self.connect_vk(secret['login'], secret['password'])
         self.vk = self.vk_session.get_api()
+        self.parsed_users = []
 
-    def connect_vk(self, login, password):
+    @staticmethod
+    def connect_vk(login, password):
         session = vk_api.VkApi(login, password)
         try:
             session.auth()
@@ -41,51 +56,66 @@ class VkParser(object):
         return int(user_id)
 
     def get_users_audio(self, session, vk_page):
-        result = r[str(vk_page)]
+        result = cache.get(str(vk_page))
         if result:
             logger.info('return from cache')
-            return list(result)     # without list() pickle.dumps doesn't work
+            return pickle.loads(result)
 
         vkaudio = VkAudio(session)
         all_audios = vkaudio.get(owner_id=vk_page)
         logger.info('got {} audios'.format(len(all_audios)))
 
-        r[str(vk_page)] = all_audios
+        if all_audios:
+            all_audios = pd.DataFrame(all_audios)
+            all_audios['user_id'] = vk_page
+            all_audios[['user_id', 'title', 'artist']].to_csv(DATASET_PATH, mode='a', index=None, header=None)
 
+            all_audios = all_audios[['title', 'artist']].to_dict()
+            cache.setex(str(vk_page), pickle._dumps(all_audios), CACHE_LIFETIME)
         return all_audios
 
 
 def on_request(ch, method, props, body):
     body = pickle.loads(body)
-    user_id = parser.get_user_id(link=body)
+    user_id = parser.get_user_id(link=body['user_id'])
 
     try:
         response = parser.get_users_audio(session=parser.vk_session, vk_page=user_id)
-    except vk_api.AccessDenied:
-        # TODO: RQM doesn't work with pickle.dumps(None)
-        # check later
+    except (vk_api.AccessDenied, AttributeError, TypeError) as e:
         response = 'Nothing'
+        logging.warning(f'access to {user_id} page denied')
     logger.info(f'parsed page of user {user_id}')
+    if ('chat_id' in body) or (props.reply_to and props.correlation_id):
+        body['user_music'] = response
 
-    ch.basic_publish(exchange='',
-                     routing_key=props.reply_to,
-                     properties=pika.BasicProperties(correlation_id=props.correlation_id),
-                     body=pickle.dumps(response))
+        channel.basic_publish(exchange='',
+                              routing_key='reco_queue',
+                              properties=pika.BasicProperties(
+                                  reply_to=props.reply_to,
+                                  correlation_id=props.correlation_id
+                              ),
+                              body=pickle.dumps(body),
+                              )
+        logger.info(f'send results to queue')
     ch.basic_ack(delivery_tag=method.delivery_tag)
 
 
 if __name__ == '__main__':
+    logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                        level=logging.INFO)
+    logger = logging.getLogger('parser')
+
     logger.info('Initialize parser')
     parser = VkParser()
 
     connection = pika.BlockingConnection(pika.ConnectionParameters(host='queue'))
     channel = connection.channel()
-    channel.queue_declare(queue='rpc_user_music')
+    channel.queue_declare(queue='user_id', arguments={'x-max-priority': 3})
 
     channel.basic_qos(prefetch_count=1)
-    channel.basic_consume(on_request, queue='rpc_user_music')
+    channel.basic_consume(on_request, queue='user_id')
 
-    r = redisworks.Root(host='redis')
+    cache = redis.Redis(host='redis')
 
     logger.info('parsing service ready')
     channel.start_consuming()
