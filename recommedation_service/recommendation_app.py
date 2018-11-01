@@ -1,4 +1,5 @@
 import logging
+import os
 import pickle
 
 import pandas as pd
@@ -12,7 +13,7 @@ sentry_logging = LoggingIntegration(
 )
 
 sentry_sdk.init(
-    dsn="https://cebc4845ef8145f1a07c77a840f64374@sentry.io/1310687",
+    dsn=os.environ.get('SENTRY_DSN'),
     integrations=[sentry_logging]
 )
 
@@ -41,7 +42,7 @@ def on_request(ch, method, props, body):
 class Recommender(object):
     def __init__(self, n_recommendations=5, novelty_level=9):
 
-        with open('data/model_w2v.pkl', 'rb') as f:
+        with open('../data/model_w2v.pkl', 'rb') as f:
             self.model = pickle.load(f)
 
         self.n_recommendations = n_recommendations

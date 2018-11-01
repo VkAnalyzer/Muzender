@@ -26,11 +26,16 @@ services:
     command: python3 recommendation_app.py
     depends_on:
       - queue
+    environment:
+      SENTRY_DSN: "${SENTRY_DSN:-}"
     networks:
       - queue_net
     restart: on-failure
+    volumes:
+      - ./data:/data
 #    logging:
 #      driver: syslog
+
 
   parser:
     build: ./parser
@@ -38,9 +43,13 @@ services:
     depends_on:
       - queue
       - redis
+    environment:
+      SENTRY_DSN: "${SENTRY_DSN:-}"
     networks:
       - queue_net
     restart: on-failure
+    volumes:
+      - ./data:/data
 #    logging:
 #      driver: syslog
 
@@ -49,6 +58,8 @@ services:
 #    command: python3 crawler.py
 #    depends_on:
 #      - queue
+#    environment:
+#      SENTRY_DSN: "${SENTRY_DSN:-}"
 #    networks:
 #      - queue_net
 #    restart: on-failure
@@ -62,6 +73,8 @@ services:
       - "8000:8000"
     depends_on:
       - queue
+    environment:
+      SENTRY_DSN: "${SENTRY_DSN:-}"
     networks:
       - queue_net
     restart: on-failure
@@ -75,6 +88,8 @@ services:
       - queue
     networks:
       - queue_net
+    environment:
+      SENTRY_DSN: "${SENTRY_DSN:-}"
     restart: on-failure
 #    logging:
 #      driver: syslog
