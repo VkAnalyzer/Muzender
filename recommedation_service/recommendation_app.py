@@ -67,6 +67,9 @@ class Recommender(object):
         logger.info(f'Got {len(artists)} artists from parser.')
 
         recommendations = self.model.predict_output_word(artists)
+        if recommendations is None:
+            logger.warning('user with empy recommendations')
+            return 'It seems you like something too out of Earth.'
         recommendations = [artist for artist, score in recommendations][:self.n_recommendations]
         logger.info(f'Recommendation: {recommendations}')
         return recommendations
