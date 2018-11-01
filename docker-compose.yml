@@ -8,8 +8,8 @@ services:
     networks:
       - queue_net
     restart: on-failure
-    logging:
-      driver: syslog
+#    logging:
+#      driver: syslog
 
   redis:
     image: redis:5.0.0
@@ -18,8 +18,8 @@ services:
     networks:
       - queue_net
     restart: on-failure
-    logging:
-      driver: syslog
+#    logging:
+#      driver: syslog
 
   recommedation_service:
     build: ./recommedation_service
@@ -29,8 +29,8 @@ services:
     networks:
       - queue_net
     restart: on-failure
-    logging:
-      driver: syslog
+#    logging:
+#      driver: syslog
 
   parser:
     build: ./parser
@@ -41,19 +41,19 @@ services:
     networks:
       - queue_net
     restart: on-failure
-    logging:
-      driver: syslog
+#    logging:
+#      driver: syslog
 
-  crawler:
-    build: ./vk_crawler
-    command: python3 crawler.py
-    depends_on:
-      - queue
-    networks:
-      - queue_net
-    restart: on-failure
-    logging:
-      driver: syslog
+#  crawler:
+#    build: ./vk_crawler
+#    command: python3 crawler.py
+#    depends_on:
+#      - queue
+#    networks:
+#      - queue_net
+#    restart: on-failure
+#    logging:
+#      driver: syslog
 
   web_server:
     build: ./web_server
@@ -65,8 +65,8 @@ services:
     networks:
       - queue_net
     restart: on-failure
-    logging:
-      driver: syslog
+#    logging:
+#      driver: syslog
 
   tg_bot:
     build: ./tg_bot
@@ -76,8 +76,8 @@ services:
     networks:
       - queue_net
     restart: on-failure
-    logging:
-      driver: syslog
+#    logging:
+#      driver: syslog
 
 networks:
   queue_net:

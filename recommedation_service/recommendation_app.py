@@ -6,9 +6,8 @@ import pika
 import sentry_sdk
 from sentry_sdk.integrations.logging import LoggingIntegration
 
-
 sentry_logging = LoggingIntegration(
-    level=logging.INFO,        # Capture info and above as breadcrumbs
+    level=logging.INFO,  # Capture info and above as breadcrumbs
     event_level=logging.ERROR  # Send errors as events
 )
 
@@ -23,11 +22,19 @@ def on_request(ch, method, props, body):
     response = model.predict(body['user_id'], body['novelty_level'], body['user_music'])
     body['recommendations'] = response
 
-    channel.basic_publish(exchange='',
-                          routing_key='tg_bot',
-                          body=pickle.dumps(body),
-                          properties=pika.BasicProperties(),
-                          )
+    if props.reply_to and props.correlation_id:
+        channel.basic_publish(exchange='',
+                              routing_key=props.reply_to,
+                              body=pickle.dumps(body),
+                              properties=pika.BasicProperties(
+                                  props.correlation_id),
+                              )
+    else:
+        channel.basic_publish(exchange='',
+                              routing_key='tg_bot',
+                              body=pickle.dumps(body),
+                              properties=pika.BasicProperties(),
+                              )
     ch.basic_ack(delivery_tag=method.delivery_tag)
 
 

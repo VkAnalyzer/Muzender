@@ -10,10 +10,9 @@ import random
 def get_recommendation(request):
     if request.method == 'POST':
         request_data = JSONParser().parse(request)
-        user_id = request_data['user_id']
 
         rpc_client = RpcClient(routing_key='user_id', host='queue')
-        predicted_bands = rpc_client.call({'user_id': user_id})
+        predicted_bands = rpc_client.call(request_data)
         # time.sleep(5)
         # predicted_bands = ['545', '3434', str(random.randint(1, 100))]
-        return JsonResponse(predicted_bands, safe=False)
+        return JsonResponse(['4'], safe=False)

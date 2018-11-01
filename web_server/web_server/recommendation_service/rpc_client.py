@@ -12,10 +12,9 @@ class RpcClient:
         self.response = None
         self.corr_id = None
 
-        result = self.channel.queue_declare(exclusive=True)
+        result = self.channel.queue_declare(exclusive=True, auto_delete=True)
         self.callback_queue = result.method.queue
-        self.consumer_tag = self.channel.basic_consume(self.on_response, no_ack=True, auto_delete=True,
-                                                       queue=self.callback_queue)
+        self.consumer_tag = self.channel.basic_consume(self.on_response, no_ack=True, queue=self.callback_queue)
 
     def on_response(self, ch, method, props, body):
         if self.corr_id == props.correlation_id:
@@ -29,6 +28,7 @@ class RpcClient:
                                    properties=pika.BasicProperties(
                                        reply_to=self.callback_queue,
                                        correlation_id=self.corr_id,
+                                       priority=2,
                                    ),
                                    body=pickle.dumps(body))
         while self.response is None:

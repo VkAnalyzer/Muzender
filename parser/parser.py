@@ -9,13 +9,12 @@ import vk_api
 from sentry_sdk.integrations.logging import LoggingIntegration
 from vk_api.audio import VkAudio
 
-
 USER_BATCH_SIZE = 100
 CACHE_LIFETIME = 60 * 60 * 24 * 3  # 3 days in seconds
 DATASET_PATH = '../data/vk_dataset.csv'
 
 sentry_logging = LoggingIntegration(
-    level=logging.INFO,        # Capture info and above as breadcrumbs
+    level=logging.INFO,  # Capture info and above as breadcrumbs
     event_level=logging.ERROR  # Send errors as events
 )
 
@@ -85,13 +84,15 @@ def on_request(ch, method, props, body):
         response = 'Nothing'
         logging.warning(f'access to {user_id} page denied')
     logger.info(f'parsed page of user {user_id}')
-
-    if 'chat_id' in body:
+    if ('chat_id' in body) or (props.reply_to and props.correlation_id):
         body['user_music'] = response
 
         channel.basic_publish(exchange='',
                               routing_key='reco_queue',
-                              properties=pika.BasicProperties(),
+                              properties=pika.BasicProperties(
+                                  reply_to=props.reply_to,
+                                  correlation_id=props.correlation_id
+                              ),
                               body=pickle.dumps(body),
                               )
         logger.info(f'send results to queue')
