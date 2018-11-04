@@ -3,35 +3,30 @@ services:
   queue:
     image: rabbitmq:3.7.2-management
     ports:
-      - "15672:15672"
+    - "5672:5672"
+    - "15672:15672"
     networks:
       - queue_net
     restart: on-failure
-    logging:
-      driver: syslog
 
   redis:
     image: redis:5.0.0
+    ports:
+      - "6379:6379"
     networks:
       - queue_net
     restart: on-failure
-    logging:
-      driver: syslog
 
   recommedation_service:
     build: ./recommedation_service
     command: python3 recommendation_app.py
     depends_on:
       - queue
-    environment:
-      SENTRY_DSN: "${SENTRY_DSN:-}"
     networks:
       - queue_net
     restart: on-failure
     volumes:
       - ./data:/data
-    logging:
-      driver: syslog
 
 
   parser:
@@ -40,28 +35,20 @@ services:
     depends_on:
       - queue
       - redis
-    environment:
-      SENTRY_DSN: "${SENTRY_DSN:-}"
     networks:
       - queue_net
     restart: on-failure
     volumes:
       - ./data:/data
-    logging:
-      driver: syslog
 
   crawler:
     build: ./vk_crawler
     command: python3 crawler.py
     depends_on:
       - queue
-    environment:
-      SENTRY_DSN: "${SENTRY_DSN:-}"
     networks:
       - queue_net
     restart: on-failure
-    logging:
-      driver: syslog
 
   web_server:
     build: ./web_server
@@ -70,13 +57,9 @@ services:
       - "8000:8000"
     depends_on:
       - queue
-    environment:
-      SENTRY_DSN: "${SENTRY_DSN:-}"
     networks:
       - queue_net
     restart: on-failure
-    logging:
-      driver: syslog
 
   tg_bot:
     build: ./tg_bot
@@ -85,11 +68,7 @@ services:
       - queue
     networks:
       - queue_net
-    environment:
-      SENTRY_DSN: "${SENTRY_DSN:-}"
     restart: on-failure
-    logging:
-      driver: syslog
 
 networks:
   queue_net:
