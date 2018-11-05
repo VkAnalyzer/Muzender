@@ -27,7 +27,7 @@ services with a single command, test different solutions in parallel and balance
 ## Super quick start:
 - download [model_w2v.pkl](https://drive.google.com/open?id=1LXEJsFOAl0TX51sNY-s5BOHknInc6Wku) (22MB) to /data/
 
-- download [dataset.pkl](https://drive.google.com/open?id=1BiMqy4YLuBIF2RWMqUbgK5OyJr7Nfw2t) (1MB) to /data/
+- download [popularity.pkl](https://drive.google.com/open?id=1BiMqy4YLuBIF2RWMqUbgK5OyJr7Nfw2t) (1MB) to /data/
 
 - setup vk account for parser:
 create dictionary with 'login' and 'password' keys and enter your values and dump it to pickle version 3 
