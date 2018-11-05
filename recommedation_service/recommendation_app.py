@@ -2,6 +2,7 @@ import logging
 import os
 import pickle
 
+import numpy as np
 import pandas as pd
 import pika
 import sentry_sdk
@@ -47,9 +48,17 @@ class Recommender(object):
         with open('../data/model_w2v.pkl', 'rb') as f:
             self.model = pickle.load(f)
 
+        with open('../data/popularity.pkl', 'rb') as f:
+            self.popularity = pickle.load(f)
+
         self.n_recommendations = n_recommendations
         self.novelty_level = novelty_level
-        self.parser = None
+
+    def _pick_random_items(self, scores, n):
+        scores -= scores.min() - 1e-10
+        scores /= np.sum(scores)
+        chosen_items = np.random.choice(list(range(len(scores))), size=min(n, len(scores)), replace=False, p=scores)
+        return chosen_items.astype(int).tolist()
 
     def predict(self, user_id, novelty_level=None, user_music='Nothing'):
         logger.info(f'New recommendation request  for user: {user_id}, novelty level: {novelty_level}')
@@ -66,13 +75,20 @@ class Recommender(object):
         artists = list(pd.DataFrame(user_music)['artist'])
         logger.info(f'Got {len(artists)} artists from parser.')
 
-        recommendations = self.model.predict_output_word(artists)
+        recommendations = self.model.predict_output_word(artists, 200)
         if recommendations is None:
             logger.warning('user with empy recommendations')
             return 'It seems you like something too out of Earth.'
-        recommendations = [artist for artist, score in recommendations][:self.n_recommendations]
+
+        recommendations = np.array(recommendations)
+        scores = recommendations[:, 1].astype(float)
+        # reweigh with reverse popularity
+        popularity = np.array([self.popularity[artist] for artist in recommendations[:, 0]])
+        scores *= (1 / popularity)
+
+        recommendations = recommendations[self._pick_random_items(np.array(scores), 5), 0]
         logger.info(f'Recommendation: {recommendations}')
-        return recommendations
+        return [str(a) for a in recommendations]
 
 
 if __name__ == '__main__':
