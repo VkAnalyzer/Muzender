@@ -20,10 +20,10 @@ sentry_sdk.init(
     integrations=[sentry_logging]
 )
 
-MIN_NOVELTY_LEVEL = 1
-MAX_NOVELTY_LEVEL = 150
-DEFAULT_NOVELTY_LEVEL = 8
-TG_BOT_PRIORITY = 2  # message priority in queue higher is better
+MIN_POPULARITY_LEVEL = 1
+MAX_POPULARITY_LEVEL = 10
+DEFAULT_POPULARITY_LEVEL = 8
+TG_BOT_PRIORITY = 2  # message priority inn queue higher is better
 
 
 def start(bot, update):
@@ -39,7 +39,8 @@ def request_recommendations(body):
                           body=pickle.dumps(body),
                           properties=pika.BasicProperties(priority=TG_BOT_PRIORITY),
                           )
-    logger.info(f'send recommendation request for user {body["user_id"]} with novelty_level {body["novelty_level"]}')
+    logger.info(f'send recommendation request for user {body["user_id"]} with popularity_level \
+                {body["popularity_level"]}')
 
 
 def on_request(ch, method, props, body):
@@ -89,20 +90,20 @@ def echo(bot, update):
         vk_id = sent.split('/')[-1]
         logger.info('new user: {}'.format(vk_id))
         user_preferences[update.message.chat_id] = {'user_id': vk_id,
-                                                    'novelty_level': DEFAULT_NOVELTY_LEVEL}
+                                                    'popularity_level': DEFAULT_POPULARITY_LEVEL}
         body.update(user_preferences[update.message.chat_id])
         request_recommendations(body)
     elif update.message.chat_id in user_preferences.keys():
         if sent == 'more accurate':
-            curr_novelty_level = user_preferences[update.message.chat_id]['novelty_level']
-            user_preferences[update.message.chat_id]['novelty_level'] = max(int(curr_novelty_level / 2),
-                                                                            MIN_NOVELTY_LEVEL)
+            curr_popularity_level = user_preferences[update.message.chat_id]['popularity_level']
+            user_preferences[update.message.chat_id]['popularity_level'] = max(curr_popularity_level - 1,
+                                                                               MIN_POPULARITY_LEVEL)
             body.update(user_preferences[update.message.chat_id])
             request_recommendations(body)
         elif sent == 'less obvious':
-            curr_novelty_level = user_preferences[update.message.chat_id]['novelty_level']
-            user_preferences[update.message.chat_id]['novelty_level'] = min(int(curr_novelty_level * 2),
-                                                                            MAX_NOVELTY_LEVEL)
+            curr_popularity_level = user_preferences[update.message.chat_id]['popularity_level']
+            user_preferences[update.message.chat_id]['popularity_level'] = min(curr_popularity_level + 1,
+                                                                            MAX_POPULARITY_LEVEL)
             body.update(user_preferences[update.message.chat_id])
             request_recommendations(body)
         elif sent == 'i like it!':

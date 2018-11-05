@@ -21,7 +21,7 @@ sentry_sdk.init(
 
 def on_request(ch, method, props, body):
     body = pickle.loads(body)
-    response = model.predict(body['user_id'], body['novelty_level'], body['user_music'])
+    response = model.predict(body['user_id'], body.get('popularity_level'), body['user_music'])
     body['recommendations'] = response
 
     if props.reply_to and props.correlation_id:
@@ -43,7 +43,7 @@ def on_request(ch, method, props, body):
 
 
 class Recommender(object):
-    def __init__(self, n_recommendations=5, novelty_level=9):
+    def __init__(self, n_recommendations=5, popularity_level=5):
 
         with open('../data/model_w2v.pkl', 'rb') as f:
             self.model = pickle.load(f)
@@ -52,18 +52,19 @@ class Recommender(object):
             self.popularity = pickle.load(f)
 
         self.n_recommendations = n_recommendations
-        self.novelty_level = novelty_level
+        self.popularity_level = popularity_level
 
-    def _pick_random_items(self, scores, n):
+    def _pick_random_items(self, items, scores, n):
         scores -= scores.min() - 1e-10
+        scores = scores ** 2
         scores /= np.sum(scores)
-        chosen_items = np.random.choice(list(range(len(scores))), size=min(n, len(scores)), replace=False, p=scores)
+        chosen_items = np.random.choice(items, size=min(n, len(scores)), replace=False, p=scores)
         return chosen_items.astype(int).tolist()
 
-    def predict(self, user_id, novelty_level=None, user_music='Nothing'):
-        logger.info(f'New recommendation request  for user: {user_id}, novelty level: {novelty_level}')
-        if novelty_level is None:
-            novelty_level = self.novelty_level
+    def predict(self, user_id, popularity_level=None, user_music='Nothing'):
+        logger.info(f'New recommendation request  for user: {user_id}, popularity level: {popularity_level}')
+        if popularity_level is None:
+            popularity_level = self.popularity_level
 
         if user_music == 'Nothing':
             logger.info(f'User {user_id} closed access to music')
@@ -72,23 +73,27 @@ class Recommender(object):
             logger.warning('Wrong user id or no music in collection.')
             return 'No such user or empty music collection.'
 
-        artists = list(pd.DataFrame(user_music)['artist'])
-        logger.info(f'Got {len(artists)} artists from parser.')
+        user_music = list(pd.DataFrame(user_music)['artist'])
+        logger.info(f'Got {len(user_music)} artists from parser.')
 
-        recommendations = self.model.predict_output_word(artists, 200)
-        if recommendations is None:
+        recs = self.model.predict_output_word(user_music, 200)
+        if recs is None:
             logger.warning('user with empy recommendations')
             return 'It seems you like something too out of Earth.'
 
-        recommendations = np.array(recommendations)
-        scores = recommendations[:, 1].astype(float)
-        # reweigh with reverse popularity
-        popularity = np.array([self.popularity[artist] for artist in recommendations[:, 0]])
-        scores *= (1 / popularity)
+        recs = pd.DataFrame(recs, columns=['band', 'relevance'])
+        recs = recs[~recs['band'].isin(user_music)]
 
-        recommendations = recommendations[self._pick_random_items(np.array(scores), 5), 0]
-        logger.info(f'Recommendation: {recommendations}')
-        return [str(a) for a in recommendations]
+        recs['popularity'] = recs['band'].apply(lambda band: self.popularity[band])
+        recs['score'] = (recs['relevance']
+                         * (1 - (popularity_level - 8) * (1 / np.log(recs['popularity'])))
+                         )
+
+        indxs = self._pick_random_items(recs.index, recs['score'], 5)
+        recs = list(recs['band'][indxs])
+
+        logger.info(f'Recommendation: {recs}')
+        return recs
 
 
 if __name__ == '__main__':
@@ -98,7 +103,7 @@ if __name__ == '__main__':
     logger.info('Initialize model')
     model = Recommender()
 
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host='queue'))
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
     channel = connection.channel()
     channel.queue_declare(queue='reco_queue')
 
