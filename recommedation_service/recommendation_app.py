@@ -62,9 +62,9 @@ class Recommender(object):
         return chosen_items.astype(int).tolist()
 
     def predict(self, user_id, popularity_level=None, user_music='Nothing'):
-        logger.info(f'New recommendation request  for user: {user_id}, popularity level: {popularity_level}')
         if popularity_level is None:
             popularity_level = self.popularity_level
+        logger.info(f'New recommendation request  for user: {user_id}, popularity level: {popularity_level}')
 
         if user_music == 'Nothing':
             logger.info(f'User {user_id} closed access to music')
@@ -103,7 +103,7 @@ if __name__ == '__main__':
     logger.info('Initialize model')
     model = Recommender()
 
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host='queue'))
     channel = connection.channel()
     channel.queue_declare(queue='reco_queue')
 

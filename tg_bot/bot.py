@@ -20,9 +20,9 @@ sentry_sdk.init(
     integrations=[sentry_logging]
 )
 
-MIN_POPULARITY_LEVEL = 1
+MIN_POPULARITY_LEVEL = 4
 MAX_POPULARITY_LEVEL = 10
-DEFAULT_POPULARITY_LEVEL = 8
+DEFAULT_POPULARITY_LEVEL = 7
 TG_BOT_PRIORITY = 2  # message priority inn queue higher is better
 
 
@@ -68,9 +68,9 @@ def on_request(ch, method, props, body):
                             reply_markup=markup,
                             )
 
-            keyboard = [[telegram.KeyboardButton('more accurate'),
+            keyboard = [[telegram.KeyboardButton('less popular'),
                          telegram.KeyboardButton('I like it!'),
-                         telegram.KeyboardButton('less obvious')]]
+                         telegram.KeyboardButton('more popular')]]
             markup = telegram.ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
             bot.sendMessage(chat_id=body['chat_id'],
                             text="your feedback is appreciated",
@@ -89,21 +89,22 @@ def echo(bot, update):
     if 'vk.com/' in sent:
         vk_id = sent.split('/')[-1]
         logger.info('new user: {}'.format(vk_id))
-        user_preferences[update.message.chat_id] = {'user_id': vk_id,
-                                                    'popularity_level': DEFAULT_POPULARITY_LEVEL}
+        user_preferences[update.message.chat_id] = {'user_id': vk_id}
         body.update(user_preferences[update.message.chat_id])
         request_recommendations(body)
     elif update.message.chat_id in user_preferences.keys():
-        if sent == 'more accurate':
-            curr_popularity_level = user_preferences[update.message.chat_id]['popularity_level']
-            user_preferences[update.message.chat_id]['popularity_level'] = max(curr_popularity_level - 1,
-                                                                               MIN_POPULARITY_LEVEL)
+        if sent == 'more popular':
+            curr_popularity_level = user_preferences[update.message.chat_id].get('popularity_level',
+                                                                                 DEFAULT_POPULARITY_LEVEL)
+            user_preferences[update.message.chat_id]['popularity_level'] = min(curr_popularity_level + 1,
+                                                                               MAX_POPULARITY_LEVEL)
             body.update(user_preferences[update.message.chat_id])
             request_recommendations(body)
-        elif sent == 'less obvious':
-            curr_popularity_level = user_preferences[update.message.chat_id]['popularity_level']
-            user_preferences[update.message.chat_id]['popularity_level'] = min(curr_popularity_level + 1,
-                                                                            MAX_POPULARITY_LEVEL)
+        elif sent == 'less popular':
+            curr_popularity_level = user_preferences[update.message.chat_id].get('popularity_level',
+                                                                                 DEFAULT_POPULARITY_LEVEL)
+            user_preferences[update.message.chat_id]['popularity_level'] = max(curr_popularity_level - 1,
+                                                                               MIN_POPULARITY_LEVEL)
             body.update(user_preferences[update.message.chat_id])
             request_recommendations(body)
         elif sent == 'i like it!':
