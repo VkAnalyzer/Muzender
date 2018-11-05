@@ -12,7 +12,7 @@ class RpcClient:
         self.response = None
         self.corr_id = None
 
-        result = self.channel.queue_declare(exclusive=True, auto_delete=True)
+        result = self.channel.queue_declare(exclusive=True, auto_delete=True, arguments={'x-expires': 10**4})
         self.callback_queue = result.method.queue
         self.consumer_tag = self.channel.basic_consume(self.on_response, no_ack=True, queue=self.callback_queue)
 
