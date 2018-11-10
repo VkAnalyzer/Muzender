@@ -71,8 +71,6 @@ def on_request(ch, method, props, body):
 
             keyboard = [[telegram.KeyboardButton('менее популярное'),
                          telegram.KeyboardButton('более популярное')],
-                        [telegram.KeyboardButton('мое последнее'),
-                         telegram.KeyboardButton('общее')],
                         [telegram.KeyboardButton('класс, мне понравилось!')],
                         ]
             markup = telegram.ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
