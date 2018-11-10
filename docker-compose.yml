@@ -24,7 +24,7 @@ services:
     depends_on:
       - queue
     environment:
-      SENTRY_DSN: "${SENTRY_DSN:-}"
+      - SENTRY_DSN
     networks:
       - queue_net
     restart: on-failure
@@ -33,7 +33,6 @@ services:
     logging:
       driver: syslog
 
-
   parser:
     build: ./parser
     command: python3 parser.py
@@ -41,7 +40,7 @@ services:
       - queue
       - redis
     environment:
-      SENTRY_DSN: "${SENTRY_DSN:-}"
+      - SENTRY_DSN
     networks:
       - queue_net
     restart: on-failure
@@ -56,7 +55,7 @@ services:
     depends_on:
       - queue
     environment:
-      SENTRY_DSN: "${SENTRY_DSN:-}"
+      - SENTRY_DSN
     networks:
       - queue_net
     restart: on-failure
@@ -71,7 +70,7 @@ services:
     depends_on:
       - queue
     environment:
-      SENTRY_DSN: "${SENTRY_DSN:-}"
+      - SENTRY_DSN
     networks:
       - queue_net
     restart: on-failure
@@ -86,7 +85,7 @@ services:
     networks:
       - queue_net
     environment:
-      SENTRY_DSN: "${SENTRY_DSN:-}"
+      - SENTRY_DSN
     restart: on-failure
     logging:
       driver: syslog
