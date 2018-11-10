@@ -41,7 +41,7 @@ def request_recommendations(body):
                           properties=pika.BasicProperties(priority=TG_BOT_PRIORITY),
                           )
     logger.info(f'send recommendation request for user {body["user_id"]} with popularity_level \
-                {body["popularity_level"]}')
+                {body,get("popularity_level", DEFAULT_POPULARITY_LEVEL)}')
 
 
 def on_request(ch, method, props, body):
@@ -111,14 +111,14 @@ def echo(bot, update):
                                                                                MIN_POPULARITY_LEVEL)
             body.update(user_preferences[update.message.chat_id])
             request_recommendations(body)
-        elif sent == 'класс!':
+        elif sent == 'класс, мне понравилось!':
             logger.info('user likes recommendation, details: {}'.format(user_preferences[update.message.chat_id]))
-            bot.sendMessage(chat_id=update.message.chat_id, text='Thanks!')
+            bot.sendMessage(chat_id=update.message.chat_id, text='Спасибо!')
         else:
             message = 'Сбрасывай ссылку на свою страницу vk, а я порекомендую музыку.'
             bot.sendMessage(chat_id=update.message.chat_id, text=message)
     else:
-        message = 'Просто сбось ссылку на свой vk.'
+        message = 'Просто сбрось ссылку на свой vk.'
         bot.sendMessage(chat_id=update.message.chat_id, text=message)
 
 
