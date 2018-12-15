@@ -41,14 +41,14 @@ services:
     volumes:
       - ./data:/data
 
-  crawler:
-    build: ./vk_crawler
-    command: python3 crawler.py
-    depends_on:
-      - queue
-    networks:
-      - queue_net
-    restart: on-failure
+#  crawler:
+#    build: ./vk_crawler
+#    command: python3 crawler.py
+#    depends_on:
+#      - queue
+#    networks:
+#      - queue_net
+#    restart: on-failure
 
   web_server:
     build: ./web_server
