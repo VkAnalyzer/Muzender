@@ -41,7 +41,7 @@ def request_recommendations(body):
                           properties=pika.BasicProperties(priority=TG_BOT_PRIORITY),
                           )
     logger.info(f'send recommendation request for user {body["user_id"]} with popularity_level \
-                {body,get("popularity_level", DEFAULT_POPULARITY_LEVEL)}')
+                {body.get("popularity_level", DEFAULT_POPULARITY_LEVEL)}')
 
 
 def on_request(ch, method, props, body):
