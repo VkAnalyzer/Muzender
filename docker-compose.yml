@@ -49,18 +49,18 @@ services:
     logging:
       driver: syslog
 
-  crawler:
-    build: ./vk_crawler
-    command: python3 crawler.py
-    depends_on:
-      - queue
-    environment:
-      - SENTRY_DSN
-    networks:
-      - queue_net
-    restart: on-failure
-    logging:
-      driver: syslog
+#  crawler:
+#    build: ./vk_crawler
+#    command: python3 crawler.py
+#    depends_on:
+#      - queue
+#    environment:
+#      - SENTRY_DSN
+#    networks:
+#      - queue_net
+#    restart: on-failure
+#    logging:
+#      driver: syslog
 
   web_server:
     build: ./web_server
