@@ -28,7 +28,6 @@ services:
     volumes:
       - ./data:/data
 
-
   parser:
     build: ./parser
     command: python3 parser.py
@@ -50,16 +49,16 @@ services:
 #      - queue_net
 #    restart: on-failure
 
-  web_server:
-    build: ./web_server
-    command: python3 web_server/manage.py runserver 0.0.0.0:8000
-    ports:
-      - "8000:8000"
-    depends_on:
-      - queue
-    networks:
-      - queue_net
-    restart: on-failure
+#  web_server:
+#    build: ./web_server
+#    command: python3 web_server/manage.py runserver 0.0.0.0:8000
+#    ports:
+#      - "8000:8000"
+#    depends_on:
+#      - queue
+#    networks:
+#      - queue_net
+#    restart: on-failure
 
   tg_bot:
     build: ./tg_bot

@@ -111,7 +111,7 @@ def echo(bot, update):
             request_recommendations(body)
         elif sent == 'good, I like it!':
             logger.info('user likes recommendation, details: {}'.format(user_preferences[update.message.chat_id]))
-            bot.sendMessage(chat_id=update.message.chat_id, text='Спасибо!')
+            bot.sendMessage(chat_id=update.message.chat_id, text='Thanks!')
         else:
             message = 'Drop the link to your vk page and I will recommend you some music.'
             bot.sendMessage(chat_id=update.message.chat_id, text=message)
