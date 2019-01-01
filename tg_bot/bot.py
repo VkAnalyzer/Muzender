@@ -28,8 +28,8 @@ TG_BOT_PRIORITY = 2  # message priority inn queue higher is better
 
 def start(bot, update):
     message = '''
-    Привет, я робот, но я немного понимаю в музыке.
-    Cбрось мне ссылку на свой профиль Вконтакте, а я порекомендую тебе что-нибудь новенькое.
+Hi, I'm Muzender - music recommender.
+Drop me a link to your vk.com account and I will suggest you some nice music.
     '''
     bot.sendMessage(chat_id=update.message.chat_id, text=message)
 
@@ -49,7 +49,7 @@ def on_request(ch, method, props, body):
     answer = body['recommendations']
     bot = body['bot']
 
-    if answer == 'Прости, но, похоже, ты закрыл доступ к своей музыке.':
+    if answer == 'No such user or empty music collection.':
         bot.sendMessage(chat_id=body['chat_id'],
                         text=answer)
     else:
@@ -65,17 +65,17 @@ def on_request(ch, method, props, body):
 
             markup = telegram.InlineKeyboardMarkup(keyboard)
             bot.sendMessage(chat_id=body['chat_id'],
-                            text='Думаю, это тебе может понравиться:',
+                            text='Check this out:',
                             reply_markup=markup,
                             )
 
-            keyboard = [[telegram.KeyboardButton('менее популярное'),
-                         telegram.KeyboardButton('более популярное')],
-                        [telegram.KeyboardButton('класс, мне понравилось!')],
+            keyboard = [[telegram.KeyboardButton('less popular'),
+                         telegram.KeyboardButton('more popular')],
+                        [telegram.KeyboardButton('good, I like it!')],
                         ]
             markup = telegram.ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
             bot.sendMessage(chat_id=body['chat_id'],
-                            text='Что думаешь?',
+                            text='Feedback is appreciated',
                             reply_markup=markup,
                             )
     ch.basic_ack(delivery_tag=method.delivery_tag)
@@ -95,28 +95,28 @@ def echo(bot, update):
         body.update(user_preferences[update.message.chat_id])
         request_recommendations(body)
     elif update.message.chat_id in user_preferences.keys():
-        if sent == 'более популярное':
+        if sent == 'more popular':
             curr_popularity_level = user_preferences[update.message.chat_id].get('popularity_level',
                                                                                  DEFAULT_POPULARITY_LEVEL)
             user_preferences[update.message.chat_id]['popularity_level'] = min(curr_popularity_level + 1,
                                                                                MAX_POPULARITY_LEVEL)
             body.update(user_preferences[update.message.chat_id])
             request_recommendations(body)
-        elif sent == 'менее популярное':
+        elif sent == 'less popular':
             curr_popularity_level = user_preferences[update.message.chat_id].get('popularity_level',
                                                                                  DEFAULT_POPULARITY_LEVEL)
             user_preferences[update.message.chat_id]['popularity_level'] = max(curr_popularity_level - 1,
                                                                                MIN_POPULARITY_LEVEL)
             body.update(user_preferences[update.message.chat_id])
             request_recommendations(body)
-        elif sent == 'класс, мне понравилось!':
+        elif sent == 'good, I like it!':
             logger.info('user likes recommendation, details: {}'.format(user_preferences[update.message.chat_id]))
             bot.sendMessage(chat_id=update.message.chat_id, text='Спасибо!')
         else:
-            message = 'Сбрасывай ссылку на свою страницу vk, а я порекомендую музыку.'
+            message = 'Drop the link to your vk page and I will recommend you some music.'
             bot.sendMessage(chat_id=update.message.chat_id, text=message)
     else:
-        message = 'Просто сбрось ссылку на свой vk.'
+        message = 'Just drop the link to your vk.com page.'
         bot.sendMessage(chat_id=update.message.chat_id, text=message)
 
 
