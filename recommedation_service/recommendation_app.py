@@ -76,9 +76,10 @@ class Recommender(object):
         user_music = list(pd.DataFrame(user_music)['artist'])
         logger.info(f'Got {len(user_music)} artists from parser.')
 
+        user_music = [a.lower().strip() for a in user_music][::-1]
         recs = self.model.predict_output_word(user_music, 200)
         if recs is None:
-            logger.warning('user with empy recommendations')
+            logger.warning('user with empty recommendations')
             return 'It seems you like something too out of Earth.'
 
         recs = pd.DataFrame(recs, columns=['band', 'relevance'])
@@ -99,6 +100,7 @@ class Recommender(object):
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
     logger = logging.getLogger('recommender')
+    logger.propagate = False
 
     logger.info('Initialize model')
     model = Recommender()
