@@ -48,8 +48,9 @@ class Recommender(object):
         with open('../data/model_w2v.pkl', 'rb') as f:
             self.model = pickle.load(f)
 
-        with open('../data/popularity.pkl', 'rb') as f:
-            self.popularity = pickle.load(f)
+        self.popularity = {}
+        for singer in self.model.wv.vocab.keys():
+            self.popularity[singer] = self.model.wv.vocab[singer].count
 
         self.n_recommendations = n_recommendations
         self.popularity_level = popularity_level
