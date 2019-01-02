@@ -48,8 +48,9 @@ class Recommender(object):
         with open('../data/model_w2v.pkl', 'rb') as f:
             self.model = pickle.load(f)
 
-        with open('../data/popularity.pkl', 'rb') as f:
-            self.popularity = pickle.load(f)
+        self.popularity = {}
+        for singer in self.model.wv.vocab.keys():
+            self.popularity[singer] = self.model.wv.vocab[singer].count
 
         self.n_recommendations = n_recommendations
         self.popularity_level = popularity_level
@@ -76,9 +77,10 @@ class Recommender(object):
         user_music = list(pd.DataFrame(user_music)['artist'])
         logger.info(f'Got {len(user_music)} artists from parser.')
 
-        recs = self.model.predict_output_word(user_music, 200)
+        user_music = [a.lower().strip() for a in user_music][::-1]
+        recs = self.model.predict_output_word(user_music, 100)
         if recs is None:
-            logger.warning('user with empy recommendations')
+            logger.warning('user with empty recommendations')
             return 'It seems you like something too out of Earth.'
 
         recs = pd.DataFrame(recs, columns=['band', 'relevance'])
@@ -86,7 +88,7 @@ class Recommender(object):
 
         recs['popularity'] = recs['band'].apply(lambda band: self.popularity[band])
         recs['score'] = (recs['relevance']
-                         * (1 - (popularity_level - 8) * (1 / np.log(recs['popularity'])))
+                         * (1 - (popularity_level - 5) * (1 / np.log(recs['popularity'])))
                          )
 
         indxs = self._pick_random_items(recs.index, recs['score'], 5)
@@ -99,6 +101,7 @@ class Recommender(object):
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
     logger = logging.getLogger('recommender')
+    logger.propagate = False
 
     logger.info('Initialize model')
     model = Recommender()

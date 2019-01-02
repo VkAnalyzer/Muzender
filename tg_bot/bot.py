@@ -124,6 +124,7 @@ if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                         level=logging.INFO)
     logger = logging.getLogger('tg bot')
+    logger.propagate = False
     logger.info('Initialize tg bot')
 
     with open('token.pkl', 'rb') as f:
