@@ -78,7 +78,7 @@ class Recommender(object):
         logger.info(f'Got {len(user_music)} artists from parser.')
 
         user_music = [a.lower().strip() for a in user_music][::-1]
-        recs = self.model.predict_output_word(user_music, 200)
+        recs = self.model.predict_output_word(user_music, 100)
         if recs is None:
             logger.warning('user with empty recommendations')
             return 'It seems you like something too out of Earth.'
@@ -88,7 +88,7 @@ class Recommender(object):
 
         recs['popularity'] = recs['band'].apply(lambda band: self.popularity[band])
         recs['score'] = (recs['relevance']
-                         * (1 - (popularity_level - 8) * (1 / np.log(recs['popularity'])))
+                         * (1 - (popularity_level - 5) * (1 / np.log(recs['popularity'])))
                          )
 
         indxs = self._pick_random_items(recs.index, recs['score'], 5)
