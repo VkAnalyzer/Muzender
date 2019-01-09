@@ -1,14 +1,18 @@
 <template>
-  <div class="input-container">
+  <div class="container">
     <form action="#">
-      <input v-model="user_id" id="user_id" placeholder="Enter vk.com profile">
-      <p class="range-field">
+      <div class="input-field inline">
+        <input v-model="user_id" id="user_id" placeholder="Enter vk.com profile">
+      </div>
+      <div class="range-field">
         <input v-model="popularity" type="range" id="pop_lvl" min="1" max="10" />
-      </p>
-    </form>
-      <button v-on:click="get_rec_bands()">
-        <span>Recommend me some cool music</span>
+      </div>
+      <button class="waves-effect waves-light btn-small" v-on:click="get_rec_bands()">
+        <span>Enjoy</span>
       </button>
+      </div>
+    </form>
+
     <p v-show="rec_bands">We recommend you to listen the following bands:</p>
       <ul>
         <li v-for="band in rec_bands">
@@ -52,13 +56,25 @@ export default {
 </script>
 
 <style>
-.input-container {
-	width: 400px;
-	display: flex;
-	flex-direction: column;
-	background: transparent;
-	max-width: 320px;
-	padding: 2rem 2rem 2rem 2rem;
-	position: relative;
+.container {
+	width: 400px !important;
 }
+
+form {
+display: flex;
+flex-direction: column;
+background-color: #fff;
+max-width: 320px;
+padding: 2rem 2rem 2rem 2rem;
+position: relative;
+box-shadow: 0 1px 1px rgba(0, 0, 0, 0.20);
+}
+
+.container.input-field inline, .range-field{
+display: flex;
+flex-flow: column-reverse;
+margin-bottom: 1em;
+}
+
+
 </style>
