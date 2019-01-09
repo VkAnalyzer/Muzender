@@ -15,6 +15,4 @@ def get_recommendation(request):
         rpc_client = RpcClient(routing_key='user_id', host='queue')
         response = rpc_client.call(request_data)
         recommendations = response['recommendations']
-        # time.sleep(5)
-        # predicted_bands = ['545', '3434', str(random.randint(1, 100))]
         return JsonResponse(recommendations, safe=False)

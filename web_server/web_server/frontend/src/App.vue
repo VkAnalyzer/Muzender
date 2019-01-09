@@ -1,6 +1,11 @@
 <template>
-  <div>
-    <input v-model="user_id" placeholder="Enter vk.com profile">
+  <div class="input-container">
+    <form action="#">
+      <input v-model="user_id" id="user_id" placeholder="Enter vk.com profile">
+      <p class="range-field">
+        <input v-model="popularity" type="range" id="pop_lvl" min="1" max="10" />
+      </p>
+    </form>
       <button v-on:click="get_rec_bands()">
         <span>Recommend me some cool music</span>
       </button>
@@ -27,6 +32,12 @@ export default {
       loading: false
     };
   },
+  mounted() {
+      this.$nextTick(function () {
+        var array_of_dom_elements = document.querySelectorAll("input[type=range]");
+        M.Range.init(array_of_dom_elements);
+      });
+  },
   methods: {
     get_rec_bands() {
       let user = {user_id: this.user_id}
@@ -39,3 +50,15 @@ export default {
   }
 }
 </script>
+
+<style>
+.input-container {
+	width: 400px;
+	display: flex;
+	flex-direction: column;
+	background: transparent;
+	max-width: 320px;
+	padding: 2rem 2rem 2rem 2rem;
+	position: relative;
+}
+</style>
