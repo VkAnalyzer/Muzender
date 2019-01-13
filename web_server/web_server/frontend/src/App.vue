@@ -5,10 +5,10 @@
         <input v-model="user_id" id="user_id" placeholder="Enter vk.com profile">
       </div>
       <div class="range-field">
-        <input v-model="popularity" type="range" id="pop_lvl" min="1" max="10" />
+        <input v-model="popularity" type="range" id="pop_lvl" min="1" max="10">
       </div>
       <button class="waves-effect waves-light btn-small" v-on:click="get_rec_bands()">
-        <span>Enjoy</span>
+        <span>Listen</span>
       </button>
       </div>
     </form>
@@ -63,18 +63,35 @@ export default {
 form {
 display: flex;
 flex-direction: column;
-background-color: #fff;
 max-width: 320px;
-padding: 2rem 2rem 2rem 2rem;
+padding: 3rem;
 position: relative;
-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.20);
+background: #474A59;
+box-shadow: 0px 0px 40px 16px rgba(0,0,0,0.22);
+color: #F1F1F2;
 }
 
-.container.input-field inline, .range-field{
+.container .input-field.inline, .range-field {
 display: flex;
 flex-flow: column-reverse;
-margin-bottom: 1em;
+margin: 1em 0em 1em 0em;
 }
 
+input[type=range] {
+border: 0px !important;
+}
+
+input[type=range]+.thumb.active .value {
+color: #474A59 !important;
+}
+
+.container .waves-effect.waves-light.btn-small {
+margin: 2em 4em 0em 4em;
+border-radius: 0px;
+}
+
+#user_id {
+color: #f2f2f2;
+}
 
 </style>
