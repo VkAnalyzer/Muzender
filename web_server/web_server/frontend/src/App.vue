@@ -1,5 +1,8 @@
 <template>
   <div class="container">
+    <div class="page-loader" v-if="loading">
+      <div class="lds-facebook"><div></div><div></div><div></div></div>
+    </div>
     <form action="#">
       <div class="input-field inline">
         <input v-model="user_id" id="user_id" placeholder="Enter vk.com profile">
@@ -33,6 +36,7 @@ export default {
     return {
       rec_bands: '',
       user_id: '',
+      popularity: 6,
       loading: false
     };
   },
@@ -45,8 +49,9 @@ export default {
   methods: {
     get_rec_bands() {
       let user = {user_id: this.user_id}
+      let pop_lvl = {popularity: this.popularity}
       this.loading = true
-      muzender_api.get_rec_bands(user).then((response_data) => {
+      muzender_api.get_rec_bands(user, pop_lvl).then((response_data) => {
         this.rec_bands = response_data
         this.loading = false
       })
@@ -63,6 +68,7 @@ export default {
 form {
 display: flex;
 flex-direction: column;
+margin: auto;
 max-width: 320px;
 padding: 3rem;
 position: relative;
@@ -93,5 +99,62 @@ border-radius: 0px;
 #user_id {
 color: #f2f2f2;
 }
+
+.page-loader {
+  position: absolute;
+  top: 0;
+  bottom: 0%;
+  left: 0;
+  right: 0%;
+  background-color: rgba(0,0,0,0.8);
+  z-index: 99;
+  display: none;
+  text-align: center;
+  width: 100%;
+}
+
+.lds-facebook {
+  position: fixed;
+  z-index: 999;
+  overflow: visible;
+  margin: auto;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  width: 64px;
+  height: 64px;
+}
+.lds-facebook div {
+  display: inline-block;
+  position: absolute;
+  left: 6px;
+  width: 13px;
+  background: #26a69a;
+  animation: lds-facebook 1.2s cubic-bezier(0, 0.5, 0.5, 1) infinite;
+}
+.lds-facebook div:nth-child(1) {
+  left: 6px;
+  animation-delay: -0.24s;
+}
+.lds-facebook div:nth-child(2) {
+  left: 26px;
+  animation-delay: -0.12s;
+}
+.lds-facebook div:nth-child(3) {
+  left: 45px;
+  animation-delay: 0;
+}
+@keyframes lds-facebook {
+  0% {
+    top: 6px;
+    height: 51px;
+  }
+  50%, 100% {
+    top: 19px;
+    height: 26px;
+  }
+}
+
 
 </style>
