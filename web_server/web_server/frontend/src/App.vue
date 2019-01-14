@@ -18,13 +18,12 @@
       </button>
       </div>
     </form>
-
-    <p v-show="rec_bands">We recommend you to listen the following bands:</p>
-      <ul>
-        <li v-for="band in rec_bands">
-          {{ band }}
-        </li>
-      </ul>
+    <p v-show="rec_bands>Recommendations</p>
+    <ul>
+      <li v-for="band in rec_bands">
+        {{ band }}
+      </li>
+    </ul>
   </div>
 </template>
 
@@ -57,6 +56,9 @@ export default {
       muzender_api.get_rec_bands(user).then((response_data) => {
         this.rec_bands = response_data
         this.loading = false
+        if (this.rec_bands.length>5) { // length of recommendations
+          M.toast({html: this.rec_bands})
+        }
       })
     }
   }
@@ -103,8 +105,8 @@ input[type=range]+.thumb.active .value {
 
 .container .waves-effect.waves-light.btn-small {
   margin: 2em 4em 0em 4em;
-  border-radius: 0px;
   /*
+  border-radius: 0px;
   position: absolute;
   width: 50%;
   right: 25%;
@@ -172,5 +174,16 @@ input[type=range]+.thumb.active .value {
   }
 }
 
+/* Change autofill color */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active  {
+    -webkit-box-shadow: 0 0 0 30px #474A59 inset !important;
+}
+
+input:-webkit-autofill {
+    -webkit-text-fill-color: #f2f2f2 !important;
+}
 
 </style>
