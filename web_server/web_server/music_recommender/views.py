@@ -10,7 +10,6 @@ import random
 def get_recommendation(request):
     if request.method == 'POST':
         request_data = JSONParser().parse(request)
-        request_data['popularity_level'] = 9
 
         rpc_client = RpcClient(routing_key='user_id', host='queue')
         response = rpc_client.call(request_data)

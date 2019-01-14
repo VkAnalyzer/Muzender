@@ -7,9 +7,12 @@
       <div class="input-field inline">
         <input v-model="user_id" id="user_id" placeholder="Enter vk.com profile">
       </div>
+      <p id="vk-id-example">Example: https://vk.com/id42</p>
       <div class="range-field">
         <input v-model="popularity" type="range" id="pop_lvl" min="1" max="10">
       </div>
+      <p id="popularity-description">Group popularity.
+        Select "1" in order to get the most unexpected recommendations</p>
       <button class="waves-effect waves-light btn-small" v-on:click="get_rec_bands()">
         <span>Listen</span>
       </button>
@@ -48,10 +51,10 @@ export default {
   },
   methods: {
     get_rec_bands() {
-      let user = {user_id: this.user_id}
-      let pop_lvl = {popularity: this.popularity}
+      let user = {user_id: this.user_id,
+                  popularity_level: this.popularity}
       this.loading = true
-      muzender_api.get_rec_bands(user, pop_lvl).then((response_data) => {
+      muzender_api.get_rec_bands(user).then((response_data) => {
         this.rec_bands = response_data
         this.loading = false
       })
@@ -66,38 +69,51 @@ export default {
 }
 
 form {
-display: flex;
-flex-direction: column;
-margin: auto;
-max-width: 320px;
-padding: 3rem;
-position: relative;
-background: #474A59;
-box-shadow: 0px 0px 40px 16px rgba(0,0,0,0.22);
-color: #F1F1F2;
+  display: flex;
+  flex-direction: column;
+  margin: auto;
+  max-width: 320px;
+  padding: 3rem;
+  position: relative;
+  background: #474A59;
+  box-shadow: 0px 0px 40px 16px rgba(0,0,0,0.22);
+  color: #F1F1F2;
 }
 
 .container .input-field.inline, .range-field {
-display: flex;
-flex-flow: column-reverse;
-margin: 1em 0em 1em 0em;
+  display: flex;
+  flex-flow: column-reverse;
+  margin: 1em 0em 0em 0em;
+  margin-bottom: 0rem !important;
+}
+
+#vk-id-example, #popularity-description {
+  margin: 0em 0em 1.5em 0em;
+  font-size: 0.75rem;
+  font-style: italic;
 }
 
 input[type=range] {
-border: 0px !important;
+  border: 0px !important;
 }
 
 input[type=range]+.thumb.active .value {
-color: #474A59 !important;
+  color: #474A59 !important;
 }
 
 .container .waves-effect.waves-light.btn-small {
-margin: 2em 4em 0em 4em;
-border-radius: 0px;
+  margin: 2em 4em 0em 4em;
+  border-radius: 0px;
+  /*
+  position: absolute;
+  width: 50%;
+  right: 25%;
+  bottom: -20px;
+  */
 }
 
 #user_id {
-color: #f2f2f2;
+  color: #f2f2f2;
 }
 
 .page-loader {
@@ -108,7 +124,7 @@ color: #f2f2f2;
   right: 0%;
   background-color: rgba(0,0,0,0.8);
   z-index: 99;
-  display: none;
+  display: block;
   text-align: center;
   width: 100%;
 }
