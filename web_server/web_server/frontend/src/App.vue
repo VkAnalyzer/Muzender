@@ -9,21 +9,26 @@
       </div>
       <p id="vk-id-example">Example: https://vk.com/id42</p>
       <div class="range-field">
-        <input v-model="popularity" type="range" id="pop_lvl" min="1" max="10">
+        <input v-model.number="popularity" type="range" id="pop_lvl" min="1" max="10">
       </div>
-      <p id="popularity-description">Group popularity.
+      <p id="popularity-description">Band popularity.
         Select "1" in order to get the most unexpected recommendations</p>
       <button class="waves-effect waves-light btn-small" v-on:click="get_rec_bands()">
         <span>Listen</span>
       </button>
-      </div>
     </form>
-    <p v-show="rec_bands>Recommendations</p>
-    <ul>
-      <li v-for="band in rec_bands">
-        {{ band }}
-      </li>
-    </ul>
+    <transition name="slide-fade">
+      <div class="recs" v-if="rec_bands">
+        <h5>Enjoy the following bands:</h5>
+        <div class="collection">
+          <a v-for="band in rec_bands" class="collection-item"
+          v-bind:href="'https://music.yandex.ru/search?text='+band.trim().replace(' ', '%20')+'&type=artists'"
+          target="_blank">
+            {{ band.charAt(0).toUpperCase() + band.slice(1) }}
+          </a>
+        </div>
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -54,10 +59,12 @@ export default {
                   popularity_level: this.popularity}
       this.loading = true
       muzender_api.get_rec_bands(user).then((response_data) => {
-        this.rec_bands = response_data
         this.loading = false
-        if (this.rec_bands.length>5) { // length of recommendations
-          M.toast({html: this.rec_bands})
+        if (response_data.length>5) { // length of recommendations
+          M.toast({html: response_data})
+        } else {
+          this.rec_bands = response_data
+          console.log(this.rec_bands)
         }
       })
     }
@@ -67,19 +74,48 @@ export default {
 
 <style>
 .container {
-	width: 400px !important;
+  display: flex;
+  height: 320px;
+  margin: 0 auto;
+	width: 640px !important;
 }
 
 form {
   display: flex;
   flex-direction: column;
   margin: auto;
-  max-width: 320px;
-  padding: 3rem;
+  width: 50%;
+  height: 100%;
+  padding: 2rem 3rem 1.5rem 3rem;
   position: relative;
   background: #474A59;
   box-shadow: 0px 0px 40px 16px rgba(0,0,0,0.22);
   color: #F1F1F2;
+  z-index:9
+}
+
+.recs {
+  background: white;
+  height: calc(100% - 40px);
+  top: 20px;
+  position: relative;
+  width: 50%;
+ }
+
+.recs .collection {
+  border: 0;
+  border-radius: 0;
+  font-weight: bold;
+  overflow: auto;
+}
+
+.collection a.collection-item {
+  color: #8c8c8c !important;
+}
+
+.recs h5 {
+  color: black;
+  text-align: center;
 }
 
 .container .input-field.inline, .range-field {
@@ -104,7 +140,7 @@ input[type=range]+.thumb.active .value {
 }
 
 .container .waves-effect.waves-light.btn-small {
-  margin: 2em 4em 0em 4em;
+  margin: 1.5em 4em 0em 4em;
   /*
   border-radius: 0px;
   position: absolute;
@@ -172,6 +208,15 @@ input[type=range]+.thumb.active .value {
     top: 19px;
     height: 26px;
   }
+}
+
+.slide-fade-enter-active {
+  transition: all 1.0s ease;
+}
+
+.slide-fade-enter {
+  transform: translateX(10px);
+  opacity: 0;
 }
 
 /* Change autofill color */
