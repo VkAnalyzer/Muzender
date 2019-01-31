@@ -25,7 +25,7 @@ All services run in Docker containers and we use docker compose for orchestratio
 services with a single command, test different solutions in parallel and balance loads. 
 
 ## Super quick start:
-- download [model_w2v.pkl](https://drive.google.com/open?id=1LXEJsFOAl0TX51sNY-s5BOHknInc6Wku) (22MB) to /data/
+- download [model_w2v.pkl](https://drive.google.com/open?id=1Jkvhuo5ULFl8L4jkwc_1XjtFkEaosyHm) (290MB) to /data/
 
 - download [popularity.pkl](https://drive.google.com/open?id=1BiMqy4YLuBIF2RWMqUbgK5OyJr7Nfw2t) (1MB) to /data/
 
