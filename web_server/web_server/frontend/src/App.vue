@@ -60,11 +60,10 @@ export default {
       this.loading = true
       muzender_api.get_rec_bands(user).then((response_data) => {
         this.loading = false
-        if (response_data.length>5) { // length of recommendations
+        if (response_data.length > 5) { // length of recommendations
           M.toast({html: response_data})
         } else {
           this.rec_bands = response_data
-          console.log(this.rec_bands)
         }
       })
     }
@@ -106,11 +105,13 @@ form {
   border: 0;
   border-radius: 0;
   font-weight: bold;
-  overflow: auto;
 }
 
 .collection a.collection-item {
   color: #8c8c8c !important;
+  text-overflow: ellipsis;
+  overflow:hidden;
+  white-space:nowrap;
 }
 
 .recs h5 {
