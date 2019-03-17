@@ -3,3 +3,6 @@ http://labrosa.ee.columbia.edu/millionsong/sites/default/files/challenge/train_t
 
 Song_id-Artist_name information:
 http://labrosa.ee.columbia.edu/millionsong/sites/default/files/AdditionalFiles/unique_artists.txt
+
+950K user playlist in "user_index, song, band" format:
+https://drive.google.com/open?id=1xTsnfQZuUbVJP0MBJrJkiKRu-crO0kWz
