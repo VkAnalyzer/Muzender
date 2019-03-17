@@ -6,10 +6,26 @@
 <html  lang="en">
   <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Muzender</title>
     {% render_bundle 'app' 'css' %}
+    <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}" />
+    <!--Import Google Icon Font-->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
   </head>
   <body>
+    <nav>
+      <div class="nav-wrapper">
+        <a href="#" class="brand-logo">MUZENDER</a>
+        <ul id="nav-mobile" class="right hide-on-med-and-down">
+          <li><a href="https://github.com/VkAnalyzer/Muzender" target="_blank">GitHub</a></li>
+      </ul>
+      </div>
+    </nav>
     <div id=app></div>
     {% render_bundle 'manifest' %}
     {% render_bundle 'vendor' %}

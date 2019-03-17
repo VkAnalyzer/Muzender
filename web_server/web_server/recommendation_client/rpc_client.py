@@ -1,6 +1,7 @@
 import uuid
 import pika
 import pickle
+import time
 
 
 class RpcClient:
@@ -12,9 +13,10 @@ class RpcClient:
         self.response = None
         self.corr_id = None
 
-        result = self.channel.queue_declare(exclusive=True, auto_delete=True)
+        result = self.channel.queue_declare(exclusive=True, auto_delete=True, arguments={'x-expires': 10**4})
         self.callback_queue = result.method.queue
         self.consumer_tag = self.channel.basic_consume(self.on_response, no_ack=True, queue=self.callback_queue)
+        self.timeout = time.time() + 60  # 1 minute timeout
 
     def on_response(self, ch, method, props, body):
         if self.corr_id == props.correlation_id:
@@ -33,6 +35,8 @@ class RpcClient:
                                    body=pickle.dumps(body))
         while self.response is None:
             self.connection.process_data_events()
+            if time.time() > self.timeout:
+                break
         self.channel.basic_cancel(self.consumer_tag)
         self.channel.queue_delete(queue=self.callback_queue)
         self.connection.close()
