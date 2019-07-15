@@ -1,22 +1,32 @@
-version: "3"
+version: "3.4"
 services:
   queue:
     image: rabbitmq:3.7.2-management
-    ports:
-      - "15672:15672"
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 20s
+        order: start-first
+      restart_policy:
+        condition: on-failure
     networks:
       - queue_net
-    restart: on-failure
     logging:
       driver: syslog
 
   redis:
     image: redis:5.0.0
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 20s
+        order: start-first
+      restart_policy:
+        condition: on-failure
     networks:
       - queue_net
-    restart: on-failure
-    logging:
-      driver: syslog
 
   recommedation_service:
     image: usasha/muzender:reco
@@ -25,11 +35,18 @@ services:
       - queue
     environment:
       - SENTRY_DSN
-    networks:
-      - queue_net
-    restart: on-failure
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 20s
+        order: start-first
+      restart_policy:
+        condition: on-failure
     volumes:
       - ./data:/data
+    networks:
+      - queue_net
     logging:
       driver: syslog
 
@@ -41,11 +58,20 @@ services:
       - redis
     environment:
       - SENTRY_DSN
-    networks:
-      - queue_net
-    restart: on-failure
+    deploy:
+      replicas: 3
+      update_config:
+        parallelism: 1
+        delay: 20s
+        order: start-first
+      restart_policy:
+        condition: on-failure
     volumes:
       - ./data:/data
+    networks:
+      - queue_net
+    dns:
+      - 8.8.8.8
     logging:
       driver: syslog
 
@@ -56,9 +82,20 @@ services:
 #      - queue
 #    environment:
 #      - SENTRY_DSN
+#    deploy:
+#      replicas: 3
+#      update_config:
+#        parallelism: 1
+#        delay: 20s
+#        order: start-first
+#      restart_policy:
+#        condition: on-failure
+#    volumes:
+#      - ./data:/data
 #    networks:
 #      - queue_net
-#    restart: on-failure
+#    dns:
+#      - 8.8.8.8
 #    logging:
 #      driver: syslog
 
@@ -71,9 +108,17 @@ services:
       - queue
     environment:
       - SENTRY_DSN
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 20s
+      restart_policy:
+        condition: on-failure
     networks:
       - queue_net
-    restart: on-failure
+    dns:
+      - 8.8.8.8
     logging:
       driver: syslog
 
@@ -82,16 +127,25 @@ services:
     command: python3 bot.py
     depends_on:
       - queue
-    networks:
-      - queue_net
     environment:
       - SENTRY_DSN
-    restart: on-failure
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 20s
+        order: start-first
+      restart_policy:
+        condition: on-failure
     volumes:
       - ./data:/data
+    networks:
+      - queue_net
+    dns:
+      - 8.8.8.8
     logging:
       driver: syslog
 
 networks:
   queue_net:
-    driver: bridge
+    driver: overlay
