@@ -48,6 +48,8 @@ services:
 #    networks:
 #      - queue_net
 #    restart: on-failure
+#    volumes:
+#      - ./data:/data
 
 #  web_server:
 #    build: ./web_server
@@ -68,6 +70,8 @@ services:
     networks:
       - queue_net
     restart: on-failure
+    volumes:
+      - ./data:/data
 
 networks:
   queue_net:

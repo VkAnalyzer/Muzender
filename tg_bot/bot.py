@@ -127,7 +127,7 @@ if __name__ == '__main__':
     logger.propagate = False
     logger.info('Initialize tg bot')
 
-    with open('token.pkl', 'rb') as f:
+    with open('../data/token.pkl', 'rb') as f:
         token = pickle.load(f)
 
     user_preferences = {}

@@ -27,7 +27,7 @@ sentry_sdk.init(
 
 class VkParser(object):
     def __init__(self):
-        with open('secret.pkl', mode='rb') as f:
+        with open('../data/secret.pkl', mode='rb') as f:
             secret = pickle.load(f)
         self.vk_session = self.connect_vk(secret['login'], secret['password'])
         self.vk = self.vk_session.get_api()
