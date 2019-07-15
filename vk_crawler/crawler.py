@@ -25,7 +25,7 @@ class VkCrawler():
         self.max_friends = max_friends
         self.max_queue_len = max_queue_len
 
-        with open('secret.pkl', mode='rb') as f:
+        with open('../data/secret.pkl', mode='rb') as f:
             secret = pickle.load(f)
         vk_session = vk_api.VkApi(secret['login'], secret['password'])
         vk_session.auth()

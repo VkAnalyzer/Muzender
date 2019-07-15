@@ -1,4 +1,5 @@
 FROM python:3.6-jessie
+VOLUME /data
 RUN mkdir /code
 ADD requirements.txt /code
 WORKDIR /code

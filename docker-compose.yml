@@ -1,69 +1,106 @@
-version: "3"
+version: "3.4"
 services:
   queue:
     image: rabbitmq:3.7.2-management
-    ports:
-      - "15672:15672"
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 20s
+        order: start-first
+      restart_policy:
+        condition: on-failure
     networks:
       - queue_net
-    restart: on-failure
     logging:
       driver: syslog
 
   redis:
     image: redis:5.0.0
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 20s
+        order: start-first
+      restart_policy:
+        condition: on-failure
     networks:
       - queue_net
-    restart: on-failure
-    logging:
-      driver: syslog
 
   recommedation_service:
-    build: ./recommedation_service
+    image: usasha/muzender:reco
     command: python3 recommendation_app.py
     depends_on:
       - queue
     environment:
       - SENTRY_DSN
-    networks:
-      - queue_net
-    restart: on-failure
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 20s
+        order: start-first
+      restart_policy:
+        condition: on-failure
     volumes:
       - ./data:/data
+    networks:
+      - queue_net
     logging:
       driver: syslog
 
   parser:
-    build: ./parser
+    image: usasha/muzender:parser
     command: python3 parser.py
     depends_on:
       - queue
       - redis
     environment:
       - SENTRY_DSN
-    networks:
-      - queue_net
-    restart: on-failure
+    deploy:
+      replicas: 3
+      update_config:
+        parallelism: 1
+        delay: 20s
+        order: start-first
+      restart_policy:
+        condition: on-failure
     volumes:
       - ./data:/data
+    networks:
+      - queue_net
+    dns:
+      - 8.8.8.8
     logging:
       driver: syslog
 
 #  crawler:
-#    build: ./vk_crawler
+#    image: usasha/muzender:vk_crawler
 #    command: python3 crawler.py
 #    depends_on:
 #      - queue
 #    environment:
 #      - SENTRY_DSN
+#    deploy:
+#      replicas: 3
+#      update_config:
+#        parallelism: 1
+#        delay: 20s
+#        order: start-first
+#      restart_policy:
+#        condition: on-failure
+#    volumes:
+#      - ./data:/data
 #    networks:
 #      - queue_net
-#    restart: on-failure
+#    dns:
+#      - 8.8.8.8
 #    logging:
 #      driver: syslog
 
   web_server:
-    build: ./web_server
+    image: usasha/muzender:web_server
     command: python3 web_server/manage.py runserver 0.0.0.0:8000
     ports:
       - "8000:8000"
@@ -71,25 +108,44 @@ services:
       - queue
     environment:
       - SENTRY_DSN
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 20s
+      restart_policy:
+        condition: on-failure
     networks:
       - queue_net
-    restart: on-failure
+    dns:
+      - 8.8.8.8
     logging:
       driver: syslog
 
   tg_bot:
-    build: ./tg_bot
+    image: usasha/muzender:tg_bot
     command: python3 bot.py
     depends_on:
       - queue
-    networks:
-      - queue_net
     environment:
       - SENTRY_DSN
-    restart: on-failure
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 20s
+        order: start-first
+      restart_policy:
+        condition: on-failure
+    volumes:
+      - ./data:/data
+    networks:
+      - queue_net
+    dns:
+      - 8.8.8.8
     logging:
       driver: syslog
 
 networks:
   queue_net:
-    driver: bridge
+    driver: overlay
