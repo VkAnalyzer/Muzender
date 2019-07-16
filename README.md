@@ -40,7 +40,7 @@ or start chat with your own Telegram bot
 `docker-compose -f docker-compose-dev.yml  up --build` 
 
 ## CI
-- all service images are available at [DockerHub](https://cloud.docker.com/u/usasha/repository/docker/usasha/muzender) 
+- all service images are available at [DockerHub](https://hub.docker.com/r/usasha/muzender) 
 and always up to date (rebuild on every commit to master)
 
 ## Build dataset and train model from scratch:
