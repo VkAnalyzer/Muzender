@@ -37,7 +37,11 @@ just open http://localhost:8000 in your browser and enter vk.com user id
 or start chat with your own Telegram bot
 
 - for development it's convenient to use docker-compose with local build:
-`docker-compose up docker-compose-dev.yml --build` 
+`docker-compose -f docker-compose-dev.yml  up --build` 
+
+## CI
+- all service images are available at [DockerHub](https://cloud.docker.com/u/usasha/repository/docker/usasha/muzender) 
+and always up to date (rebuild on every commit to master)
 
 ## Build dataset and train model from scratch:
 - get data:
