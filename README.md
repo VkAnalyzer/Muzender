@@ -15,35 +15,38 @@ We use Word2Vec, it supports online recommendation without recalculation, it tak
 recomendations for new user. It also have tiny memory footprint which allows to host whole system on 1 CPU, 
 1GB RAM server.
 - vk.com user page parser:
-We use vk_api implementation to parse all user music data. We run multiple parsers at the same time to work with several users simultaneously.
+We use vk_api implementation to parse all user music data. We run multiple parsers at the same time to work 
+with several users simultaneously.
 - Redis to cache parser results for fast recommendation recalculation when user changes settings.
 - message queue:
 RabbitMQ as queue manager. Really easy to work with and functional.
 - vk.com crawler: it runs through user's friends and friends of friends, send their pages to parser to collect dataset. 
 
-All services run in Docker containers and we use docker compose for orchestration. This allows to deploy and run all 
+All services run in Docker containers and we use docker swarm for orchestration in production 
+and docker-compose for development. This allows to deploy and run all 
 services with a single command, test different solutions in parallel and balance loads. 
 
 ## Super quick start:
-- download [model_w2v.pkl](https://drive.google.com/open?id=1Jkvhuo5ULFl8L4jkwc_1XjtFkEaosyHm) (290MB) to /data/
-
-- setup vk account for parser:
-create dictionary with 'login' and 'password' keys and enter your values and dump it to pickle version 3 
-to parser/secret.pkl and crawler/secret.pkl
-
-- setup telegram bot token:
-pickle string with bot token and dump it to tg_bot/token.pkl 
+- run `python quickstart.py` in console and follow instructions to setup environment
 
 - start service:
-cd to root folder of the project and run: `docker-compose up --build .`
+cd to root folder of the project and run: `docker stack up -c docker-compose.yml muzender`
 
 - get your recommendation:
 just open http://localhost:8000 in your browser and enter vk.com user id
+or start chat with your own Telegram bot
+
+- for development it's convenient to use docker-compose with local build:
+`docker-compose -f docker-compose-dev.yml  up --build` 
+
+## CI
+- all service images are available at [DockerHub](https://cloud.docker.com/u/usasha/repository/docker/usasha/muzender) 
+and always up to date (rebuild on every commit to master)
 
 ## Build dataset and train model from scratch:
 - get data:
 You can use Million Song Dataset and Echo Nest user-music rating dataset. 
-Download these tables /data/ (you will find links in dataset_sources.txt file of this folder).
+Download these tables to ./data/ (you will find links in dataset_sources.txt file of this folder).
 
 Alternatively you can use our own dataset which includes 950K of music playlists (links also in dataset_sources.txt file of this folder)
 
