@@ -52,3 +52,9 @@ Run /model_creation/dataset_assembly.ipynb to reformat data to apropriate format
 
 - train model:
 Run /model_creation/w2v_recommender.ipynb to generate model and band popularity index.
+
+## Dataset
+During project development we collected huge dataset of user music playlists, we believe it's one of the biggest 
+(950K unique users, 92M interactions) open datasets with user-item interactions with real item names available.
+
+You can find dataset on [Kaggle](https://www.kaggle.com/usasha/million-music-playlists).
