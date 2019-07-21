@@ -74,10 +74,10 @@ class Recommender(object):
             logger.warning('Wrong user id or no music in collection.')
             return 'No such user or empty music collection.'
 
-        user_music = list(pd.DataFrame(user_music)['artist'])
+        user_music = user_music
         logger.info(f'Got {len(user_music)} artists from parser.')
 
-        user_music = [a.lower().strip() for a in user_music][::-1]
+        user_music = [a.lower().strip() for a in user_music]
         recs = self.model.predict_output_word(user_music, 100)
         if recs is None:
             logger.warning('user with empty recommendations')

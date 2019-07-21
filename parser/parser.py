@@ -70,7 +70,7 @@ class VkParser(object):
             all_audios['user_id'] = vk_page
             all_audios[['user_id', 'title', 'artist']].to_csv(DATASET_PATH, mode='a', index=None, header=None)
 
-            all_audios = all_audios[['title', 'artist']].to_dict()
+            all_audios = list(all_audios['artist'])[::-1]
             cache.setex(name=str(vk_page),
                         value=pickle._dumps(all_audios),
                         time=CACHE_LIFETIME)
