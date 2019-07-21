@@ -33,31 +33,31 @@ class VkCrawler():
 
         self.parsed_users = []
 
-    def recursive_get_friends(self, user_id, curr_level):
+    def recursive_get_friends(self, vk_page, curr_level):
         if curr_level:
             try:
-                result = self.vk.users.getFollowers(user_id=user_id)['items'][:self.max_friends]
+                result = self.vk.users.getFollowers(user_id=vk_page)['items'][:self.max_friends]
                 result = [user for user in result if user not in self.parsed_users]
                 for user in result:
                     channel.basic_publish(exchange='',
-                                          routing_key='user_id',
+                                          routing_key='parser_queue',
                                           properties=pika.BasicProperties(),
-                                          body=pickle.dumps({'user_id': str(user)}),
+                                          body=pickle.dumps({'vk_page': str(user)}),
                                           )
-                    self.parsed_users.append(user_id)
+                    self.parsed_users.append(vk_page)
 
-                    res = channel.queue_declare(queue='user_id', passive=True)
+                    res = channel.queue_declare(queue='parser_queue', passive=True)
                     queue_length = res.method.message_count
                     while queue_length >= self.max_queue_len:
                         time.sleep(20)
-                        res = channel.queue_declare(queue='user_id', passive=True)
+                        res = channel.queue_declare(queue='parser_queue', passive=True)
                         queue_length = res.method.message_count
 
                 for user in result:
                     self.recursive_get_friends(user, curr_level - 1)
 
             except vk_api.ApiError as e:
-                logging.debug(f'user: {user_id}, error: {e}')
+                logging.debug(f'user: {vk_page}, error: {e}')
 
     def start(self, user_zero):
         logging.info('starting crawler')
