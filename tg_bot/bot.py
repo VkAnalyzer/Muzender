@@ -23,6 +23,7 @@ sentry_sdk.init(
 MIN_POPULARITY_LEVEL = 4
 MAX_POPULARITY_LEVEL = 10
 DEFAULT_POPULARITY_LEVEL = 7
+MIN_TEXT_TO_PARSE = 200
 TG_BOT_PRIORITY = 2  # message priority inn queue higher is better
 
 
@@ -35,8 +36,12 @@ Drop me a link to your vk.com account and I will suggest you some nice music.
 
 
 def request_recommendations(body):
+    if 'user_music' in body:
+        routing_key = 'reco_queue'
+    else:
+        routing_key = 'user_id'
     channel.basic_publish(exchange='',
-                          routing_key='user_id',
+                          routing_key=routing_key,
                           body=pickle.dumps(body),
                           properties=pika.BasicProperties(priority=TG_BOT_PRIORITY),
                           )
@@ -93,6 +98,9 @@ def echo(bot, update):
         logger.info('new user: {}'.format(vk_id))
         user_preferences[update.message.chat_id] = {'user_id': vk_id}
         body.update(user_preferences[update.message.chat_id])
+        request_recommendations(body)
+    elif len(sent) > MIN_TEXT_TO_PARSE:
+        body['user_music'] = sent.split('\n')
         request_recommendations(body)
     elif update.message.chat_id in user_preferences.keys():
         if sent == 'more popular':
