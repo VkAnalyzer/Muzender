@@ -101,6 +101,7 @@ def echo(bot, update):
         request_recommendations(body)
     elif len(sent) > MIN_TEXT_TO_PARSE:
         body['user_music'] = sent.split('\n')
+        body['user_id'] = 'anonymous'
         request_recommendations(body)
     elif update.message.chat_id in user_preferences.keys():
         if sent == 'more popular':
