@@ -79,14 +79,14 @@ class VkParser(object):
 
 def on_request(ch, method, props, body):
     body = pickle.loads(body)
-    user_id = parser.get_user_id(link=body['user_id'])
+    vk_page = parser.get_user_id(link=body['vk_page'])
 
     try:
-        response = parser.get_users_audio(session=parser.vk_session, vk_page=user_id)
+        response = parser.get_users_audio(session=parser.vk_session, vk_page=vk_page)
     except (vk_api.AccessDenied, AttributeError, TypeError) as e:
         response = 'Nothing'
-        logging.warning(f'access to {user_id} page denied')
-    logger.info(f'parsed page of user {user_id}')
+        logging.warning(f'access to {vk_page} page denied')
+    logger.info(f'parsed page of user {vk_page}')
     if ('chat_id' in body) or (props.reply_to and props.correlation_id):
         body['user_music'] = response
 
@@ -113,10 +113,10 @@ if __name__ == '__main__':
 
     connection = pika.BlockingConnection(pika.ConnectionParameters(host='queue'))
     channel = connection.channel()
-    channel.queue_declare(queue='user_id', arguments={'x-max-priority': 3})
+    channel.queue_declare(queue='parser_queue', arguments={'x-max-priority': 3})
 
     channel.basic_qos(prefetch_count=1)
-    channel.basic_consume(on_request, queue='user_id')
+    channel.basic_consume(on_request, queue='parser_queue')
 
     cache = redis.Redis(host='redis')
 

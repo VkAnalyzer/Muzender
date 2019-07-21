@@ -10,7 +10,7 @@ import random
 def get_recommendation(request):
     if request.method == 'POST':
         request_data = JSONParser().parse(request)
-        rpc_client = RpcClient(routing_key='user_id', host='queue')
+        rpc_client = RpcClient(routing_key='parser_queue', host='queue')
         response = rpc_client.call(request_data)
         recommendations = response['recommendations']
         return JsonResponse(recommendations, safe=False)

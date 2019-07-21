@@ -21,7 +21,7 @@ sentry_sdk.init(
 
 def on_request(ch, method, props, body):
     body = pickle.loads(body)
-    response = model.predict(body['user_id'], body.get('popularity_level'), body['user_music'])
+    response = model.predict(body.get('popularity_level'), body['user_music'])
     body['recommendations'] = response
 
     if props.reply_to and props.correlation_id:
@@ -34,7 +34,7 @@ def on_request(ch, method, props, body):
         logger.info(f'Predictions sent to web_server')
     else:
         channel.basic_publish(exchange='',
-                              routing_key='tg_bot',
+                              routing_key='tg_bot_queue',
                               body=pickle.dumps(body),
                               properties=pika.BasicProperties(),
                               )
@@ -62,13 +62,13 @@ class Recommender(object):
         chosen_items = np.random.choice(items, size=min(n, len(scores)), replace=False, p=scores)
         return chosen_items.astype(int).tolist()
 
-    def predict(self, user_id, popularity_level=None, user_music='Nothing'):
+    def predict(self, popularity_level=None, user_music='Nothing'):
         if popularity_level is None:
             popularity_level = self.popularity_level
-        logger.info(f'New recommendation request  for user: {user_id}, popularity level: {popularity_level}')
+        logger.info(f'New recommendation request  for user, popularity level: {popularity_level}')
 
         if user_music == 'Nothing':
-            logger.info(f'User {user_id} closed access to music')
+            logger.info(f'User closed access to music')
             return 'Sorry, you closed access to your music collection.'
         if len(user_music) == 0:
             logger.warning('Wrong user id or no music in collection.')
